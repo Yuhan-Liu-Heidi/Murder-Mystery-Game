@@ -14,11 +14,11 @@ def verify_user(ID, p):
     try:
         u_id = [x for x in user_dict.keys() if x == ID][0]
     except IndexError:
-        return print(error_messages[1])
+        return error_messages[1]
     try:
         assert p == user_dict[u_id]["p"]
     except AssertionError:
-        return print(error_messages[2])
+        return error_messages[2]
     return  # jump to page:
 
 
