@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 user_dict = {"Heidi": {"ID": "Heidi", "p": "0326"}}
-story_dict = {"stories": [], "clues":[]}
+story_dict = {"stories": [], "clues": []}
 error_messages = {1: "用户名不正确",
                   2: "密码不正确"}
 
@@ -19,7 +19,7 @@ def verify_user(ID, p):
         assert p == user_dict[u_id]["p"]
     except AssertionError:
         return print(error_messages[2])
-    return # jump to page:
+    return  # jump to page:
 
 
 # @app.route("/new_game", methods=["POST"])
