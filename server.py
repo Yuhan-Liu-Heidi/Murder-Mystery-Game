@@ -3,6 +3,7 @@ from flask import Flask
 
 app = Flask(__name__)
 global user_dict, story_dict
+user_dict = {}
 story_dict = {"chars": {"黑底": True, "米亚": True},
               "stories": {"黑底": 121, "米亚": 111},
               "clues": {"黑底": 121, "米亚": 111}}
@@ -23,6 +24,7 @@ def new_user(i, p):
 
 # @app.route()
 def verify_user(i, p):
+    global user_dict
     try:
         u_id = [x for x in user_dict.keys() if x == i][0]
     except IndexError:
@@ -52,8 +54,8 @@ def assign_character(i, ch):
 # @app.route("")
 if __name__ == "__main__":
     # app.run()
-    new_user("Heidi", "0326")
-    print(user_dict)
-    assign_character("Heidi", "黑底")
-    print(user_dict)
+    # new_user("Heidi", "0326")
+    # print(user_dict)
+    # assign_character("Heidi", "黑底")
+    # print(user_dict)
     pass
