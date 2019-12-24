@@ -1,4 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
+import server
+
 
 app = Flask(__name__)
 
@@ -13,31 +15,36 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    error = None
-    message = None
-    # Hard coding!!!!!
-    user_existing = False
     if request.method == "POST":
         if request.form["action"] == "signup":
-            if user_existing is True:
-                error = "The user has existed"
+            signed_up = server.new_user(request.form["username"],
+                                        request.form["psw"])
+            if not signed_up:
+                error_msg = "The user has existed"
             else:
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
-            if request.form["username"] != "lily" or request.form["psw"] != "123":
-                error = "Invalid login please try again"
-            else:
-                return redirect(url_for("choose_ch", uname=request.form["username"]))
-    return render_template("login.html", error=error)
+            logged_in = server.verify_user(request.form["username"],
+                                           request.form["psw"])
+            if type(logged_in) == str:
+                error_msg = logged_in
+            elif logged_in:
+                return redirect(url_for("choose_ch",
+                                        uname=request.form["username"]))
+    return render_template("login.html", error=error_msg)
 
 
 @app.route("/<uname>/choose_ch", methods=["GET", "POST"])
-def choose_ch(uname):
+def choose_ch(u_name):
     if request.method == "POST":
-        # check if user has chosen one ch or if it matches to the chosen one
-        chname = request.form["choose_ch"]
-        return redirect(url_for("play", uname=uname, chname=chname))
+        ch_name = request.form["choose_ch"]
+        chose_ch = server.assign_character(u_name, ch_name)
+        if choose_ch:
+            return redirect(url_for("play", uname=u_name, chname=ch_name))
+        else:
+            error_msg = chose_ch
+            render_template("choose_ch.html", error=error_msg)
     else:
         return render_template("choose_ch.html")
 
