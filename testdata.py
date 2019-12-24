@@ -30,12 +30,19 @@ user = {'01': {'pw': '111',
                }
         }
 
-game = {'chars': {'A': True, 'B': True, 'C': True},
-        'clues': {'p1': [['clue1 at p1 w/ hidden',
-                          'hidden of clue1 at p1'],
-                         ['clue2 at p1 w/o hidden']],
-                  'p2': [['1/1 clue at p2 ele1'],
-                         ['1/1 clue at p2 ele2']]
+game = {'chars': {'A': False, 'B': False, 'C': False},
+        'clues': {'round1': {'p1': [['clue1 at p1 w/ hidden',
+                                     'hidden of clue1 at p1'],
+                                    ['clue2 at p1 w/o hidden']],
+                             'p2': [['clue1 at p2 w/o hidden'],
+                                    ['clue2 at p2 w/o hidden']]
+                             },
+                  'round2': {'p1': [['clue1 at p1 w/ hidden',
+                                     'hidden of clue1 at p1'],
+                                    ['clue2 at p1 w/o hidden']],
+                             'p2': [['clue1 at p2 w/o hidden'],
+                                    ['clue2 at p2 w/o hidden']]
+                             }
                   },
         'stories': {'A': 'A story',
                     'B': 'B story',
