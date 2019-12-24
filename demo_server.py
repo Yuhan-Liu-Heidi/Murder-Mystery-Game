@@ -25,10 +25,12 @@ def login():
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
-            if request.form["username"] != "lily" or request.form["psw"] != "123":
+            if request.form["username"] != "lily" or \
+                    request.form["psw"] != "123":
                 error = "Invalid login please try again"
             else:
-                return redirect(url_for("choose_ch", uname=request.form["username"]))
+                return redirect(url_for("choose_ch",
+                                        uname=request.form["username"]))
     return render_template("login.html", error=error)
 
 
