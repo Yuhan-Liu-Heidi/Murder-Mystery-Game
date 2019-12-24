@@ -25,6 +25,7 @@ def login():
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
+<<<<<<< HEAD:gui.py
             logged_in = server.verify_user(request.form["username"],
                                            request.form["psw"])
             if type(logged_in) == str:
@@ -33,6 +34,15 @@ def login():
                 return redirect(url_for("choose_ch",
                                         uname=request.form["username"]))
     return render_template("login.html", error=error_msg)
+=======
+            if request.form["username"] != "lily" or \
+                    request.form["psw"] != "123":
+                error = "Invalid login please try again"
+            else:
+                return redirect(url_for("choose_ch",
+                                        uname=request.form["username"]))
+    return render_template("login.html", error=error)
+>>>>>>> fa268e2f862cd1de28b07550c7794039ef601d1a:demo_server.py
 
 
 @app.route("/<uname>/choose_ch", methods=["GET", "POST"])
