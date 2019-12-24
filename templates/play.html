@@ -37,7 +37,7 @@
   font-size: 15px;
 }
 
-.active, .collapsible:hover {
+.collapsible:hover {
   background-color: #555;
 }
 
@@ -47,10 +47,6 @@
   font-weight: bold;
   float: right;
   margin-left: 5px;
-}
-
-.active:after {
-  content: "\2212";
 }
 
 .content {
@@ -66,6 +62,16 @@
     .menu, .main{
     width:100%;
     }
+}
+
+.btn-off {
+    background: #555555;
+    color: white;
+}
+
+.btn-on {
+    background: white;
+    color: black;
 }
 </style>
 </head>
@@ -84,13 +90,13 @@
     <div class="menu">
         <a href="#C1">回到顶部</a>
         <a href="#C2">故事</a>
-        <a href="#C3">搜证地点</a>
+        <a href="#C3">搜证</a>
         <a href="#C4">证据</a>
     </div>
 </div>
 
 <script>
-function myFunction() {
+function hide() {
   var x = document.getElementById("myImage");
   var y = document.getElementById("hideImage");
   if (x.style.display === "none") {
@@ -101,6 +107,16 @@ function myFunction() {
     y.value = "展开故事"
   }
 }
+function clue1() {
+    var x = document.getElementById("btn1");
+    x.style.background = "white";
+    x.style.color = "black"
+}
+function clue2() {
+    var x = document.getElementById("btn2");
+    x.style.background = "white";
+    x.style.color = "black"
+}
 </script>
 
 <div style="overflow:auto">
@@ -110,21 +126,31 @@ function myFunction() {
          <p>{{ msg1["chname"] }}</p>
       {% endif %}
     <h3 id="C2">故事</h3>
-    <input type="button" id="hideImage" value="展开故事" onclick="myFunction()">
+    <input type="button" id="hideImage" value="展开故事" onclick="hide()">
         <img id="myImage" src="https://raw.githubusercontent.com/memerye/class_team/master/IMG_1680.JPG" alt="story" style="display:none;">
     <hr>
-    <h3 id="C3">搜证地点</h3>
+    <h3 id="C3">搜证</h3>
+      <button id="btn1" class="btn-off" onclick="clue1()">一轮搜证</button>
+      <button id="btn2" class="btn-off" onclick="clue2()">二轮搜证</button>
+      {% if msg_all_submit1 %}
       <ul>
-        <form action="http://127.0.0.1:5000/sum" method="post">
-            <li>房间 3/3<button value="Submit" type="text">搜证</button></li>
+        <form action="" method="post">
+            <li>房间 3/3 <button value="Submit" type="text">搜证</button></li>
         </form>
-        <form action="http://127.0.0.1:5000/sum" method="post">
-            <li>客厅 3/5<button value="Submit" type="text">搜证</button></li>
+        <form action="" method="post">
+            <li>客厅 3/5 <button value="Submit" type="text">搜证</button></li>
         </form>
-        <form action="http://127.0.0.1:5000/sum" method="post">
-            <li>厨房 1/3<button value="Submit" type="text">搜证</button></li>
+        <form action="" method="post">
+            <li>厨房 1/3 <button value="Submit" type="text">搜证</button></li>
         </form>
       </ul>
+      {% else %}
+      <ul>
+        <li>房间 3/3 <button type="text" class="btn-off">搜证</button></li>
+        <li>客厅 3/5 <button type="text" class="btn-off">搜证</button></li>
+        <li>厨房 1/3 <button type="text" class="btn-off">搜证</button></li>
+      </ul>
+      {% endif %}
     <hr>
     <h3 id="C4">证据</h3>
     <div style="float:left;width:50%">
