@@ -15,6 +15,7 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error_msg = None
     if request.method == "POST":
         if request.form["action"] == "signup":
             signed_up = server.new_user(request.form["username"],
@@ -36,7 +37,7 @@ def login():
     return render_template("login.html", error=error_msg)
 
 
-@app.route("/<uname>/choose_ch", methods=["GET", "POST"])
+@app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
 def choose_ch(u_name):
     if request.method == "POST":
         ch_name = request.form["choose_ch"]
@@ -50,10 +51,10 @@ def choose_ch(u_name):
         return render_template("choose_ch.html")
 
 
-@app.route("/<uname>/play/<chname>", methods=["GET", "POST"])
-def play(uname, chname):
+@app.route("/<u_name>/play/<ch_name>", methods=["GET", "POST"])
+def play(u_name, ch_name):
     if request.method == "GET":
-        message = {"uname": uname, "chname": chname}
+        message = {"u_name": u_name, "ch_name": ch_name}
         return render_template("play.html", msg1=message)
 
 
