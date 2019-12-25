@@ -1,61 +1,71 @@
 from flask import Flask
+from testdata import user, game
 
 
 app = Flask(__name__)
-global user_dict, story_dict
-user_dict = {}
-story_dict = {"chars": {"黑底": True, "米亚": True},
-              "stories": {"黑底": 121, "米亚": 111},
-              "clues": {"黑底": 121, "米亚": 111}}
-error_messages = {0: "用户名不正确",
-                  1: "密码不正确",
-                  2: "该用户已存在",
-                  3: "该用户不存在"}
+
+
+error_messages = {0: "该用户不存在",
+                  1: "该用户已存在",
+                  2: "密码不正确",
+                  3: "本轮搜证未开始",
+                  4: "您已选好角色"}
 
 
 def new_user(i, p):
-    global user_dict
-    if i not in user_dict.keys():
-        user_dict[i] = {"pw": p, "char": None, "ap": 16, "clue": None}
-        return  # jump to page:
+    from database import user
+    if i not in user.keys():
+        database.create_us
+        return True
     else:
-        return error_messages[2]
+        return False
 
 
 # @app.route()
 def verify_user(i, p):
-    global user_dict
+    from database import user
     try:
-        u_id = [x for x in user_dict.keys() if x == i][0]
+        u_id = [x for x in user.keys() if x == i][0]
     except IndexError:
         return error_messages[0]
     try:
-        assert p == user_dict[u_id]["pw"]
+        assert p == user[u_id]["pw"]
     except AssertionError:
-        return error_messages[1]
-    return  # jump to page:
+        return error_messages[2]
+    return True
 
 
-# @app.route("/new_game", methods=["POST"])
-def new_game():
-    pass
-
-
-def assign_character(i, ch):
-    global user_dict
+def assign_character(i, ch_name):
+    from database import user, game
     try:
-        u_id = [x for x in user_dict.keys() if x == i][0]
+        u_id = [x for x in user.keys() if x == i][0]
     except IndexError:
+        return error_messages[0]
+    database.assign_ch()
+    return True
+
+
+def user_ready(u_id, n_round):
+    user[u_id]["round"][n_round] = True
+    return
+
+
+def start_round(n_round):
+    n_start = sum([user[x]["round"][n_round] for x in user])
+    if n_start < game["player_num"]:
+        return False
+    else:
+        return True
+
+
+def search_clue(n_round):
+    if start_round(n_round):
+        pass
+    else:
         return error_messages[3]
-    user_dict[u_id]["CH"] = ch
-    return  # jump to page:
 
 
 # @app.route("")
 if __name__ == "__main__":
     # app.run()
-    # new_user("Heidi", "0326")
-    # print(user_dict)
-    # assign_character("Heidi", "黑底")
-    # print(user_dict)
     pass

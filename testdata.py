@@ -8,7 +8,7 @@ user = {'01': {'pw': '111',
                                ['this is 1/1 clue at p1 ele2']],
                         'p2': [['this is 1/1 clue at p2 ele1'],
                                ['this is 1/1 clue at p2 ele2']]},
-               'round': {'1': False, '2': False}
+               'round': {1: False, 2: False}
                },
         '02': {'pw': '222',
                'char': {'name': None, 'story': None},
@@ -18,7 +18,7 @@ user = {'01': {'pw': '111',
                                ['this is 1/1 clue at p1 ele2']],
                         'p2': [['this is 1/1 clue at p2 ele1'],
                                ['this is 1/1 clue at p2 ele2']]},
-               'round': {'1': False, '2': False}
+               'round': {1: False, 2: False}
                },
         '03': {'pw': '333',
                'char': {'name': None, 'story': None},
@@ -28,7 +28,7 @@ user = {'01': {'pw': '111',
                                ['this is 1/1 clue at p1 ele2']],
                         'p2': [['this is 1/1 clue at p2 ele1'],
                                ['this is 1/1 clue at p2 ele2']]},
-               'round': {'1': False, '2': False}
+               'round': {1: False, 2: False}
                }
         }
 
