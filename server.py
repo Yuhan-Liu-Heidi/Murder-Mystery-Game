@@ -35,31 +35,32 @@ def verify_user(i, p):
     return True
 
 
-def assign_character(i, ch_name):
-    from database import user, game
-    try:
-        u_id = [x for x in user.keys() if x == i][0]
-    except IndexError:
-        return error_messages[0]
-    database.assign_ch()
-    return True
+def verify_ch(i):
+    from database import user
+    u_id = [x for x in user.keys() if x == i][0]
+    if user[u_id]["char"]["name"] is not None:
+        return user[u_id]["char"]["name"]
+    else:
+        return False
 
 
-def user_ready(u_id, n_round):
-    user[u_id]["round"][n_round] = True
+def user_ready(u_id, n_rnd):
+    user[u_id]["round"][n_rnd] = True
     return
 
 
-def start_round(n_round):
-    n_start = sum([user[x]["round"][n_round] for x in user])
+def start_rnd(n_rnd):
+    from database import user
+    n_start = sum([user[x]["round"][n_rnd] for x in user])
     if n_start < game["player_num"]:
         return False
     else:
         return True
 
 
-def search_clue(n_round):
-    if start_round(n_round):
+def search_clue(u_id, n_rnd, place):
+    from database import user, game
+    if start_rnd(n_rnd):
         pass
     else:
         return error_messages[3]

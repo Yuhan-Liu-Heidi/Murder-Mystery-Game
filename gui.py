@@ -15,6 +15,7 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error_msg = None
     if request.method == "POST":
         if request.form["action"] == "signup":
             signed_up = server.new_user(request.form["username"],
@@ -37,24 +38,30 @@ def login():
 
 
 @app.route("/<uname>/choose_ch", methods=["GET", "POST"])
-def choose_ch(u_name):
+def choose_ch(uname):
+    import database
+    if request.method == "GET":
+        chname = server.verify_ch(uname)
+        if chname is str:
+            return redirect(url_for("play", uname=uname, chname=chname))
     if request.method == "POST":
-        ch_name = request.form["choose_ch"]
-        chose_ch = server.assign_character(u_name, ch_name)
-        if choose_ch:
-            return redirect(url_for("play", uname=u_name, chname=ch_name))
-        else:
-            error_msg = chose_ch
-            render_template("choose_ch.html", error=error_msg)
+        chname = request.form["choose_ch"]
+        database.assign_character(uname, chname)
+        return redirect(url_for("play", uname=uname, chname=chname))
     else:
         return render_template("choose_ch.html")
 
 
 @app.route("/<uname>/play/<chname>", methods=["GET", "POST"])
 def play(uname, chname):
+    # from database import game
     if request.method == "GET":
         message = {"uname": uname, "chname": chname}
         return render_template("play.html", msg1=message)
+
+
+def search_clue(n_rnd):
+    pass
 
 
 if __name__ == "__main__":
