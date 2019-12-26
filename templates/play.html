@@ -1,89 +1,121 @@
+<!--
+only one msg_info:
+{u_name:"lily",
+ ch_name:"良星星"}
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-* {
-  box-sizing: border-box;
-}
-.menu {
-    float:left;
-    width:20%;
-    text-align:center;
-}
-.menu a {
-    background-color:#e5e5e5;
-    padding:8px;
-    margin-top:7px;
-    display:block;
-    width:100%;
-    color:black;
-}
-.main {
-    float:left;
-    width:80%;
-    padding:0 20px;
-}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        .menu {
+            float:left;
+            width:20%;
+            text-align:center;
+        }
+        .menu a {
+            background-color:#e5e5e5;
+            padding:8px;
+            margin-top:7px;
+            display:block;
+            width:100%;
+            color:black;
+        }
+        .main {
+            float:left;
+            width:80%;
+            padding:0 20px;
+        }
 
-.collapsible {
-  background-color: #777;
-  color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-}
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+        }
 
-.collapsible:hover {
-  background-color: #555;
-}
+        .collapsible:hover {
+            background-color: #555;
+        }
 
-.collapsible:after {
-  content: '\002B';
-  color: white;
-  font-weight: bold;
-  float: right;
-  margin-left: 5px;
-}
+        .collapsible:after {
+            content: '\002B';
+            color: white;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
 
-.content {
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;
-}
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+        }
 
-@media only screen and (max-width:620px) {
-    /* For mobile phones: */
-    .menu, .main{
-    width:100%;
+        @media only screen and (max-width:620px) {
+            /* For mobile phones: */
+            .menu, .main{
+            width:100%;
+            }
+        }
+
+        .btn-off {
+            background: #555555;
+            color: white;
+        }
+
+    </style>
+</head>
+
+<script>
+function hide() {
+    var x = document.getElementById("myImage");
+    var y = document.getElementById("hideImage");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+        y.value = "隐藏故事"
+    } else {
+        x.style.display = "none";
+        y.value = "展开故事"
     }
 }
 
-.btn-off {
-    background: #555555;
-    color: white;
+function clue1() {
+    var x = document.getElementById("btn1");
+    var y = document.getElementById("btn2");
+    x.style.background = "white";
+    x.style.color = "black";
+    y.style.display = "inline";
 }
 
-.btn-on {
-    background: white;
-    color: black;
+function clue2() {
+    var x = document.getElementById("btn2");
+    x.style.background = "white";
+    x.style.color = "black";
 }
-</style>
-</head>
+</script>
+
 <body style="font-family:Verdana;color:#aaaaaa;">
 
 <div style="background-color:#e5e5e5;padding:15px;text-align:center;">
     <h1 id="C1">剧本杀2333</h1>
-    <p>user id:
-      {% if msg1 %}
-         {{ msg1["uname"] }}
-      {% endif %}
-        <br>AP: 8</p>
+    <p>user id:</p>
+        {% if msg_info %}
+            <p id="u_name"> {{ msg_info["u_name"] }}</p>
+        {% endif %}
+        <br>
+    <label id="ap">AP: 8</label>
 </div>
 
 <div style="position: sticky; top: 0;">
@@ -95,133 +127,162 @@
     </div>
 </div>
 
-<script>
-function hide() {
-  var x = document.getElementById("myImage");
-  var y = document.getElementById("hideImage");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-    y.value = "隐藏故事"
-  } else {
-    x.style.display = "none";
-    y.value = "展开故事"
-  }
-}
-function clue1() {
-    var x = document.getElementById("btn1");
-    x.style.background = "white";
-    x.style.color = "black"
-}
-function clue2() {
-    var x = document.getElementById("btn2");
-    x.style.background = "white";
-    x.style.color = "black"
-}
-</script>
-
 <div style="overflow:auto">
-  <div class="main">
+    <div class="main">
     <h2>角色🎭</h2>
-      {% if msg1 %}
-         <p>{{ msg1["chname"] }}</p>
-      {% endif %}
+    {% if msg_info %}
+        <div id="ch_name">{{ msg_info["ch_name"] }}</div>
+    {% endif %}
+
     <h3 id="C2">故事</h3>
     <input type="button" id="hideImage" value="展开故事" onclick="hide()">
-        <img id="myImage" src="https://raw.githubusercontent.com/memerye/class_team/master/IMG_1680.JPG" alt="story" style="display:none;">
+    <img id="myImage" src="{{ url_for("static", filename=msg_info["ch_name"]+".jpg") }}" alt="story" style="display:none;">
     <hr>
+
     <h3 id="C3">搜证</h3>
-      <button id="btn1" class="btn-off" onclick="clue1()">一轮搜证</button>
-      <button id="btn2" class="btn-off" onclick="clue2()">二轮搜证</button>
-      {% if msg_all_submit1 %}
-      <ul>
-        <form action="" method="post">
-            <li>房间 3/3 <button value="Submit" type="text">搜证</button></li>
-        </form>
-        <form action="" method="post">
-            <li>客厅 3/5 <button value="Submit" type="text">搜证</button></li>
-        </form>
-        <form action="" method="post">
-            <li>厨房 1/3 <button value="Submit" type="text">搜证</button></li>
-        </form>
-      </ul>
-      {% else %}
-      <ul>
-        <li>房间 3/3 <button type="text" class="btn-off">搜证</button></li>
-        <li>客厅 3/5 <button type="text" class="btn-off">搜证</button></li>
-        <li>厨房 1/3 <button type="text" class="btn-off">搜证</button></li>
-      </ul>
-      {% endif %}
+    <button id="btn1" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round1(); } else { return false; }">一轮搜证</button>
+    <button id="btn2" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round2(); } else { return false; }" style="display:none;">二轮搜证</button>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+    function start_round1() {
+        var x = document.getElementById("btn1");
+        var y = document.getElementById("btn2");
+        x.style.background = "white";
+        x.style.color = "black";
+        y.style.display = "inline";
+        setTimeout(function round1() {
+            var user_name = $("#u_name").text().trim();
+            $.ajax({
+                url: "/start_round1/",
+                type: "get",
+                data: {name_ready_for_1: user_name},
+                success: function round1_s(data) {
+                    if (data.result == "1") {
+                        $("#C3").text("一轮搜证开始！");
+                        $("#p1, #p2, #p3").removeClass("btn-off");
+                    } else {
+                        $("#C3").text("搜证未开始，请等待...");
+                    }
+                },
+                error: function round1_e() {
+                    $("#p1, #p2, #p3").style.background = "red";
+                },
+                complete: function round1_c() {
+                    time1 = setTimeout(round1, 1000);
+                    $("#btn2").click(function() {clearTimeout(time1);});
+                }
+            });
+        }, 1000);
+    }
+
+    function start_round2() {
+        var x = document.getElementById("btn2");
+        x.style.background = "white";
+        x.style.color = "black";
+        setTimeout(function round2(){
+            var user_name = $("#u_name").text().trim();
+            $.ajax({
+                url: "/start_round2/",
+                type: "get",
+                data: {name_ready_for_2: user_name},
+                success: function round2_s(data) {
+                        if (data.result=="1") {
+                            $("#C3").text("二轮搜证开始！");
+                        } else {
+                            $("#C3").text("搜证未开始，请等待...");
+                        }
+                    },
+                error: function round2_e() {
+                    $("#p1, #p2, #p3").style.background = "red";
+                },
+                complete: function round2_c() {
+                    time2 = setTimeout(round2,1000);
+                }
+            });
+        }, 1000);
+    };
+    </script>
+
+
+    <ul>
+        <li>房间 3/3 <button id="p1" type="text" class="btn-off">搜证</button></li>
+        <li>客厅 3/5 <button id="p2" type="text" class="btn-off">搜证</button></li>
+        <li>厨房 1/3 <button id="p3" type="text" class="btn-off">搜证</button></li>
+    </ul>
+
     <hr>
     <h3 id="C4">证据</h3>
     <div style="float:left;width:50%">
-    <p>已搜证据</p>
-    <button class="collapsible">地点1</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
-    </div>
-    <button class="collapsible">地点2</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
-    </div>
-    <button class="collapsible">地点3</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
-    </div>
+        <p>已搜证据</p>
+        <button class="collapsible">地点1</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
+        <button class="collapsible">地点2</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
+        <button class="collapsible">地点3</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
     </div>
 
     <div style="float:left;width:50%">
-    <p>公开证据</p>
-    <button class="collapsible">地点1</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
+        <p>公开证据</p>
+        <button class="collapsible">地点1</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
+        <button class="collapsible">地点2</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
+        <button class="collapsible">地点3</button>
+        <div class="content">
+            <ul>
+                <li>证据</li>
+                <li>证据</li>
+            </ul>
+        </div>
     </div>
-    <button class="collapsible">地点2</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
-    </div>
-    <button class="collapsible">地点3</button>
-    <div class="content">
-        <ul>
-            <li>证据</li>
-            <li>证据</li>
-        </ul>
-    </div>
-    </div>
+    <hr>
+    <div style="background-color:#e5e5e5;text-align:center;padding:10px;margin-top:7px;">© copyright Lily Heidi Lucy Mia</div>
 
 <script>
 var coll = document.getElementsByClassName("collapsible");
 var i;
 for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.maxHeight){
-      content.style.maxHeight = null;
-    } else {
-      content.style.maxHeight = content.scrollHeight + "px";
-    }
-  });
+    coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+            content.style.maxHeight = null;
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    });
 }
 </script>
-  </div>
-</div>
 
-<div style="background-color:#e5e5e5;text-align:center;padding:10px;margin-top:7px;">© copyright Lily Heidi Lucy Mia</div>
+    </div>
+</div>
 
 </body>
 </html>
