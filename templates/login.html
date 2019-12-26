@@ -1,118 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-image: url('https://images.pexels.com/photos/619419/pexels-photo-619419.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
 
-input[type=text], input[type=password] {
-  width: 60%;
-  padding: 12px 20px;
-  margin: 8px auto;
-  display: inline-block;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background: #f1f1f1;
-}
+        input[type=text], input[type=password] {
+            width: 60%;
+            padding: 12px 20px;
+            margin: 8px auto;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background: #f1f1f1;
+        }
 
-input[type=text]:focus, input[type=password]:focus {
-  background-color: #ddd;
-  outline: none;
-}
+        input[type=text]:focus, input[type=password]:focus {
+            background-color: #ddd;
+            outline: none;
+        }
 
-button {
-  color: white;
-  padding: 14px 20px;
-  margin: 8px auto;
-  border: none;
-  cursor: pointer;
-  width: 30%;
-}
+        button {
+            color: white;
+            padding: 14px 20px;
+            margin: 8px auto;
+            border: none;
+            cursor: pointer;
+            width: 30%;
+        }
 
-.container {
-    border-radius: 20px;
-  position: absolute;
-  width: 30%;
-  margin-top: 100px;
-  margin-left: 300px;
-  background: white;
-  background: rgba(255, 255, 255, 0.15);
-}
+        .container {
+            border-radius: 20px;
+            position: absolute;
+            width: 30%;
+            margin-top: 100px;
+            margin-left: 300px;
+            background: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
 
-.container input{
-  padding: 16px;
-  margin: 24px 10px 12px 0px;
-}
+        .container input{
+            padding: 16px;
+            margin: 24px 10px 12px 0px;
+        }
 
-.container label{
-  color: white;
-  padding: 16px;
-  text-align: center;
-  margin: auto 0px auto 30px;
-}
+        .container label{
+            color: white;
+            padding: 16px;
+            text-align: center;
+            margin: auto 0px auto 30px;
+        }
 
-body {
-  background-image: url('https://images.pexels.com/photos/619419/pexels-photo-619419.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260');
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-}
+        .alert {
+            padding: 20px;
+            color: white;
+        }
 
-.alert {
-    padding: 20px;
-    color: white;
-}
+        .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-.closebtn {
-  margin-left: 15px;
-  color: white;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.closebtn:hover {
-  color: black;
-}
-</style>
+        .closebtn:hover {
+            color: black;
+        }
+    </style>
 </head>
 <body>
-
 <form action="" method="post">
-  <div class="container">
-    <h1 style="color: white; margin-left: 42px">Who is the Murderer?</h1>
-    <label for="uname"><b>Username</b></label>
-    <input type="text" placeholder="Enter Username" name="username" id="username" value="{{request.form.username}}" required>
-    <br>
-    <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" id="psw" value="{{request.form.psw}}" required>
-    <br>
-    <button type="submit" style="margin: 24px 1px 12px 140px;background-color: #007bff;" name="action" value="signup">Sign up</button>
-    <button type="submit" style="margin: 24px 0px 50px 0px;background-color: #4CAF50;" name="action" value="login">Login</button>
-  </div>
+    <div class="container">
+        <h1 style="color: white; margin-left: 42px">Who is the Murderer?</h1>
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" id="username" value="{{request.form.username}}" required>
+        <br>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" id="psw" value="{{request.form.psw}}" required>
+        <br>
+        <button type="submit" style="margin: 24px 1px 12px 140px;background-color: #007bff;" name="action" value="signup">Sign up</button>
+        <button type="submit" style="margin: 24px 0px 50px 0px;background-color: #4CAF50;" name="action" value="login">Login</button>
+    </div>
 </form>
 
 {% if error %}
     <div class="alert" style="background-color: #f44336;">
-      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-      <strong>ERROR!</strong> {{ error }}
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong>ERROR!</strong> {{ error }}
     </div>
 {% endif %}
 
 {% if msg1 %}
     <div class="alert" style="background-color: #4CAF50;">
-      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-      <strong>YEAH!</strong> {{ msg1 }}
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong>YEAH!</strong> {{ msg1 }}
     </div>
 {% endif %}
 
 <div style="height:100%; padding-bottom: 1em">
-<div style="position: absolute; bottom: 0; right: 0">
-    <a href="https://www.pexels.com/photo/background-black-black-and-white-creepy-619419/" target="_blank">The image resource</a>
-</div>
+    <div style="position: absolute; bottom: 0; right: 0">
+        <a href="https://www.pexels.com/photo/background-black-black-and-white-creepy-619419/" target="_blank">The image resource</a>
+    </div>
 </div>
 </body>
 </html>

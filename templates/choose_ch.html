@@ -1,177 +1,175 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .all{
+            margin: 0 auto;
+            text-align: center;
+            align-items: center;
+        }
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+            margin: 10px;
+            text-align: center;
+            font-family: arial;
+            float: left;
+        }
 
-    .all{
-        margin: 0 auto;
-        text-align: center;
-        align-items: center;
-    }
-.card {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  max-width: 300px;
-  margin: 10px;
-  text-align: center;
-  font-family: arial;
-  float: left;
-}
+        .title {
+            color: grey;
+            font-size: 18px;
+            }
 
-.title {
-  color: grey;
-  font-size: 18px;
-}
+        button {
+            border: none;
+            outline: 0;
+            display: inline-block;
+            padding: 8px;
+            color: white;
+            background-color: #000;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+        }
 
-button {
-  border: none;
-  outline: 0;
-  display: inline-block;
-  padding: 8px;
-  color: white;
-  background-color: #000;
-  text-align: center;
-  cursor: pointer;
-  width: 100%;
-  font-size: 18px;
-}
+        a {
+            text-decoration: none;
+            font-size: 22px;
+            color: black;
+        }
 
-a {
-  text-decoration: none;
-  font-size: 22px;
-  color: black;
-}
+        button:hover, a:hover {
+            opacity: 0.7;
+        }
 
-button:hover, a:hover {
-  opacity: 0.7;
-}
+        .alert {
+            padding: 20px;
+            color: white;
+        }
 
-.alert {
-padding: 20px;
-color: white;
-}
+        .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-.closebtn {
-  margin-left: 15px;
-  color: white;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.closebtn:hover {
-  color: black;
-}
-</style>
+        .closebtn:hover {
+            color: black;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1 style="text-align:center">Profile Cards</h1>
 <hr>
 
 <div class="all">
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/cecusatchx.jpeg" alt="ch1" style="width:300px;height: 400px">
-  <h1>良小花</h1>
-  <p class="title">女，当红小花，演技派。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="良小花" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/cecusatchx.jpeg" alt="ch1" style="width:300px;height: 400px">
+        <h1>良小花</h1>
+        <p class="title">女，当红小花，演技派。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="良小花" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/hphgidogfz.jpeg" alt="ch2" style="width:300px;height: 400px">
-  <h1>良星星</h1>
-  <p class="title">女，生日寿星。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="良星星" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/hphgidogfz.jpeg" alt="ch2" style="width:300px;height: 400px">
+        <h1>良星星</h1>
+        <p class="title">女，生日寿星。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="良星星" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/mkmwqfnwky.jpeg" alt="ch3" style="width:300px;height: 400px">
-  <h1>米亚伦</h1>
-  <p class="title">女，同班同学。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="米亚伦" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/mkmwqfnwky.jpeg" alt="ch3" style="width:300px;height: 400px">
+        <h1>米亚伦</h1>
+        <p class="title">女，同班同学。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="米亚伦" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/hlhdcgpdpv.jpeg" alt="ch4" style="width:300px;height: 400px">
-  <h1>黑轮海</h1>
-  <p class="title">女，同班同学。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="黑轮海" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/hlhdcgpdpv.jpeg" alt="ch4" style="width:300px;height: 400px">
+        <h1>黑轮海</h1>
+        <p class="title">女，同班同学。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="黑轮海" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/hphgidofhz.jpeg" alt="ch5" style="width:300px;height: 400px">
-  <h1>希嘻嘻</h1>
-  <p class="title">女，lo裙小能手，学生会主席。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="希嘻嘻" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/hphgidofhz.jpeg" alt="ch5" style="width:300px;height: 400px">
+        <h1>希嘻嘻</h1>
+        <p class="title">女，lo裙小能手，学生会主席。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="希嘻嘻" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/mkmwqfngsy.jpeg" alt="ch6" style="width:300px;height: 400px">
-  <h1>嵩主角</h1>
-  <p class="title">男，学校助教。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="嵩主角" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/mkmwqfngsy.jpeg" alt="ch6" style="width:300px;height: 400px">
+        <h1>嵩主角</h1>
+        <p class="title">男，学校助教。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="嵩主角" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/mkmwqfnswy.jpeg" alt="ch7" style="width:300px;height: 400px">
+        <h1>大幂幂</h1>
+        <p class="title">女，好姐妹。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="大幂幂" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/mkmwqfnswy.jpeg" alt="ch7" style="width:300px;height: 400px">
-  <h1>大幂幂</h1>
-  <p class="title">女，好姐妹。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="大幂幂" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+          <img src="http://pic.17qq.com/uploads/cecusatwcx.jpeg" alt="ch8" style="width:300px;height: 400px">
+          <h1>tc第二帅</h1>
+          <p class="title">男，tc第二帅2。</p>
+          <form action="" method="post">
+              <button name="choose_ch" value="tc第二帅" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+          </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/cecusatwcx.jpeg" alt="ch8" style="width:300px;height: 400px">
-  <h1>tc第二帅</h1>
-  <p class="title">男，tc第二帅2。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="tc第二帅" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/mkmwqfngny.jpeg" alt="ch9" style="width:300px;height: 400px">
+        <h1>撒比尔</h1>
+        <p class="title">男，小矮人。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="撒比尔" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/mkmwqfngny.jpeg" alt="ch9" style="width:300px;height: 400px">
-  <h1>撒比尔</h1>
-  <p class="title">男，小矮人。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="撒比尔" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
-
-<div class="card">
-  <img src="http://pic.17qq.com/uploads/cecusatqqx.jpeg" alt="ch10" style="width:300px;height: 400px">
-  <h1>黄学</h1>
-  <p class="title">男，学长。</p>
-  <form action="" method="post">
-  <button name="choose_ch" value="黄学" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-  </form>
-</div>
+    <div class="card">
+        <img src="http://pic.17qq.com/uploads/cecusatqqx.jpeg" alt="ch10" style="width:300px;height: 400px">
+        <h1>黄学</h1>
+        <p class="title">男，学长。</p>
+        <form action="" method="post">
+            <button name="choose_ch" value="黄学" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
+        </form>
+    </div>
 </div>
 
 {% if msg %}
     <div class="alert" style="background-color: #4CAF50;">
-      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-      <strong>YEAH!</strong> {{ msg }}
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong>YEAH!</strong> {{ msg }}
     </div>
 {% endif %}
-
 
 </body>
 </html>
