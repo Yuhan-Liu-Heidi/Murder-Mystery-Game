@@ -75,5 +75,20 @@ def start_round2():
         return jsonify(result="0")
 
 
+@app.route("/clue_num/")
+def clue_num():
+    # return: place=[已搜, 所有】
+    return jsonify(p1=[1, 3], p2=[1, 4], p3=[0, 3])
+
+
+@app.route("/find_clue/")
+def find_clue():
+    name = str(request.args.get("name_find_clue1")).lower()
+    place = str(request.args.get("name_place")).lower()
+    # somehow get the clue in someplace for someone
+    # update numbers in place
+    return jsonify(u_name=name, place=place, clue="线索1", hidden=True)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
