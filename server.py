@@ -9,13 +9,16 @@ error_messages = {0: "该用户不存在",
                   1: "该用户已存在",
                   2: "密码不正确",
                   3: "本轮搜证未开始",
-                  4: "您已选好角色"}
+                  4: "您已选好角色",
+                  5: "这不是您的角色，请不要作弊哦~",
+                  6: "该角色不存在"}
 
 
 def new_user(i, p):
     from database import user
+    import database
     if i not in user.keys():
-        database.create_us
+        database.create_user(i, p)
         return True
     else:
         return False
@@ -35,31 +38,47 @@ def verify_user(i, p):
     return True
 
 
-def assign_character(i, ch_name):
-    from database import user, game
-    try:
-        u_id = [x for x in user.keys() if x == i][0]
-    except IndexError:
-        return error_messages[0]
-    database.assign_ch()
-    return True
+def new_ch(i, ch_name):
+    from database import user, add_char, track
+    if track['chars'][ch_name]:
+        return False
+    elif user[i]["char"] is not None:
+        return user[i]["char"]
+    else:
+        add_char(i, ch_name)
+        return True
 
 
-def user_ready(u_id, n_round):
-    user[u_id]["round"][n_round] = True
+def verify_ch(i):
+    from database import user
+    u_id = [x for x in user.keys() if x == i][0]
+    if user[u_id]["char"] is not None:
+        return user[u_id]["char"]
+    else:
+        return False
+
+
+def user_ready(u_id, n_rnd):
+    user[u_id]["round"][n_rnd] = True
     return
 
 
-def start_round(n_round):
-    n_start = sum([user[x]["round"][n_round] for x in user])
+def start_rnd(n_rnd, u_id):
+    from database import user, game, track_round
+    track_round(u_id, n_rnd)
+    print(user)
+    n_start = sum([user[x]["round"][n_rnd] for x in user])
+    print(n_start)
+    print(game["player_num"])
     if n_start < game["player_num"]:
         return False
     else:
         return True
 
 
-def search_clue(n_round):
-    if start_round(n_round):
+def search_clue(u_id, n_rnd, place):
+    from database import user, game
+    if start_rnd(n_rnd):
         pass
     else:
         return error_messages[3]
