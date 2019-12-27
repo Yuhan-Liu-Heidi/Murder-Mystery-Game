@@ -39,9 +39,24 @@ def choose_ch(u_name):
     if request.method == "POST":
         # check if user has chosen one ch or if it matches to the chosen one
         ch_name = request.form["choose_ch"]
-        return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
+        # is_chosen=False -> This ch has not been chosen
+        # is_chosen=True -> This ch has been chosen
+        is_chosen = False
+        if is_chosen is False:
+            return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
+        else:
+            message = "此角色已被选择"
+            return render_template("choose_ch.html", message=message)
     else:
         return render_template("choose_ch.html")
+
+
+@app.route("/is_chosen/")
+def is_chosen():
+    # ch1=False -> This ch1 has not been chosen
+    # ch1=True -> This ch1 has been chosen
+    return jsonify(ch1=False, ch2=False, ch3=True, ch4=True, ch5=True,
+                   ch6=True, ch7=True, ch8=True, ch9=True, ch10=True)
 
 
 @app.route("/<u_name>/play/<ch_name>/", methods=["GET", "POST"])
