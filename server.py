@@ -38,11 +38,22 @@ def verify_user(i, p):
     return True
 
 
+def new_ch(i, ch_name):
+    from database import user, add_char, track
+    if track['chars'][ch_name]:
+        return False
+    elif user[i]["char"] is not None:
+        return user[i]["char"]
+    else:
+        add_char(i, ch_name)
+        return True
+
+
 def verify_ch(i):
     from database import user
     u_id = [x for x in user.keys() if x == i][0]
-    if user[u_id]["char"]["name"] is not None:
-        return user[u_id]["char"]["name"]
+    if user[u_id]["char"] is not None:
+        return user[u_id]["char"]
     else:
         return False
 
@@ -52,9 +63,13 @@ def user_ready(u_id, n_rnd):
     return
 
 
-def start_rnd(n_rnd):
-    from database import user
+def start_rnd(n_rnd, u_id):
+    from database import user, game, track_round
+    track_round(u_id, n_rnd)
+    print(user)
     n_start = sum([user[x]["round"][n_rnd] for x in user])
+    print(n_start)
+    print(game["player_num"])
     if n_start < game["player_num"]:
         return False
     else:
