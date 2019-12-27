@@ -42,11 +42,20 @@ def choose_ch(u_name):
     import database
     if request.method == "POST":
         ch_name = request.form["choose_ch"]
-        database.add_char(u_name, ch_name)
-        return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
+        ch_added = server.new_ch(u_name, ch_name)
+        if ch_added:
+            return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
+        elif not ch_added:
+            message = "此角色已被选择"
+            # return render_template("choose_ch.html", msg=message)
+            print("此处会有通知无法选择")
+            return render_template("choose_ch.html")
+        else:
+            return redirect(url_for("play", u_name=u_name, ch_name=ch_added))
     else:
         ch_name = server.verify_ch(u_name)
-        if ch_name is str:
+        print(ch_name)
+        if type(ch_name) == str:
             return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
         else:
             return render_template("choose_ch.html")
@@ -58,7 +67,7 @@ def play(u_name, ch_name):
     from server import error_messages
     message = None
     if request.method == "GET":
-        ch = user[u_name]["char"]["name"]
+        ch = user[u_name]["char"]
         if ch_name == ch:
             message = {"u_name": u_name, "ch_name": ch_name}
             return render_template("play.html", msg_info=message)
@@ -67,6 +76,21 @@ def play(u_name, ch_name):
                 return error_messages[5]
             else:
                 return error_messages[6]
+
+
+@app.route("/start_round1/")
+def start_round1():
+    from server import start_rnd
+    from database import user
+    name1 = request.args.get("name_ready_for_1")
+    u_id = str(name1).lower()
+    # Receive the names that are ready.
+    check = start_rnd(1, u_id)
+    print(check)
+    if check:
+        return jsonify(result="1")
+    else:
+        return jsonify(result="0")
 
 
 if __name__ == "__main__":
