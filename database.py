@@ -1,8 +1,20 @@
 # assume ap is the same for round1 and round2
-# create function that reads in game from game.json
+import json
 global user, game
 user = {}
-game = {'round_ap': 4}
+
+
+def rd_game():
+    global game
+    file_path = "sample_game.json"
+    in_file = open(file_path, "r")
+    game = json.load(in_file)
+    in_file.close()
+    print(game)
+    return game
+
+
+game = rd_game()
 
 
 def create_user(user_id, pw):
@@ -95,3 +107,7 @@ def create_game():
             'player_num': 3  # input
             }
     return
+
+
+if __name__ == "__main__":
+    rd_game()
