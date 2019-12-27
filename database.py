@@ -1,7 +1,8 @@
 # assume ap is the same for round1 and round2
-
+# create function that reads in game from game.json
 global user, game
 user = {}
+game = {'round_ap': 4}
 
 
 def create_user(user_id, pw):
