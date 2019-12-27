@@ -20,7 +20,7 @@ game = rd_game()
 def create_user(user_id, pw):
     global user, game
     user[user_id] = {'pw': pw,
-                     'char': {'name': None, 'story': None},
+                     'char': None,
                      'ap': game['round_ap'],
                      'clue': {},
                      'round': {1: False, 2: False}
@@ -43,7 +43,7 @@ def add_char(user_id, char):
     user[user_id]['char'] = char
     track['chars'][char] = True
     print('User {} has chosen character {}'.format(user_id, char))
-    return
+    return user, track
 
 
 def clue_update(user_id, place):
