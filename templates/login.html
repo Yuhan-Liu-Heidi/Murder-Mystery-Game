@@ -5,12 +5,11 @@
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background-image: url('https://images.pexels.com/photos/619419/pexels-photo-619419.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260');
+            background-image: url("{{ url_for("static", filename="images/login_background.jpeg") }}");
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-size: cover;
         }
-
         input[type=text], input[type=password] {
             width: 60%;
             padding: 12px 20px;
@@ -20,48 +19,54 @@
             box-sizing: border-box;
             background: #f1f1f1;
         }
-
         input[type=text]:focus, input[type=password]:focus {
             background-color: #ddd;
             outline: none;
         }
 
-        button {
-            color: white;
+        .button_login {
+            position: relative;
             padding: 14px 20px;
-            margin: 8px auto;
             border: none;
             cursor: pointer;
             width: 30%;
+            margin: 24px 0px 50px 0px;
+            background-color: #4CAF50;
+        }
+
+        .button_signup {
+            position: relative;
+            padding: 14px 20px;
+            border: none;
+            cursor: pointer;
+            width: 30%;
+            margin: 24px 1px 12px 140px;
+            background-color: #007bff;
         }
 
         .container {
             border-radius: 20px;
             position: absolute;
-            width: 30%;
-            margin-top: 100px;
-            margin-left: 300px;
+            width: 450px;
+            margin-top: 5%;
+            margin-left: 15%;
             background: white;
             background: rgba(255, 255, 255, 0.15);
         }
-
         .container input{
             padding: 16px;
             margin: 24px 10px 12px 0px;
         }
-
         .container label{
             color: white;
             padding: 16px;
             text-align: center;
             margin: auto 0px auto 30px;
         }
-
         .alert {
             padding: 20px;
             color: white;
         }
-
         .closebtn {
             margin-left: 15px;
             color: white;
@@ -72,24 +77,48 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         .closebtn:hover {
             color: black;
         }
+
+        @media only screen and (max-width:1260px) {
+            /* For mobile phones: */
+            body {
+                background-position: center;
+            }
+
+            .button_signup {
+                margin: 24px 1px 12px 60px;
+            }
+
+            .container input{
+                padding: 16px;
+                margin: 24px 10px 12px 60px;
+            }
+        }
+
+        @media only screen and (max-width:620px) {
+            .container {
+                margin-top: 5%;
+                margin-left: 10%;
+                position: center;
+                width: 80%;
+            }
+        }
     </style>
 </head>
-<body>
 <form action="" method="post">
     <div class="container">
-        <h1 style="color: white; margin-left: 42px">Who is the Murderer?</h1>
+        <br>
+        <h1 style="color: white; margin-left: 42px;">Who is the Murderer?</h1>
         <label for="uname"><b>Username</b></label>
         <input type="text" placeholder="Enter Username" name="username" id="username" value="{{request.form.username}}" required>
         <br>
         <label for="psw"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="psw" id="psw" value="{{request.form.psw}}" required>
         <br>
-        <button type="submit" style="margin: 24px 1px 12px 140px;background-color: #007bff;" name="action" value="signup">Sign up</button>
-        <button type="submit" style="margin: 24px 0px 50px 0px;background-color: #4CAF50;" name="action" value="login">Login</button>
+        <button type="submit" class="button_signup" name="action" value="signup">Sign up</button>
+        <button type="submit" class="button_login" name="action" value="login">Login</button>
     </div>
 </form>
 

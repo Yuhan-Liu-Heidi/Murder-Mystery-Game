@@ -4,10 +4,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
-    background-image: url('https://i.pinimg.com/originals/82/c7/6f/82c76fa6f52b7eb63919e529f95a7726.gif');
+    background-image: url("{{ url_for("static", filename="images/background_welcome.gif") }}");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
+    background-position: center;
 }
 
 .button {
@@ -16,6 +17,16 @@ body {
     left: 47%;
     padding: 15px 32px;
     border-radius: 10px;
+}
+
+@media only screen and (max-width:620px) {
+/* For mobile phones: */
+body {
+    background-position: center;
+}
+.button{
+    position: center;
+}
 }
 </style>
 </head>

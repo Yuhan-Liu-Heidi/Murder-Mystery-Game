@@ -65,8 +65,10 @@ only one msg_info:
 
         @media only screen and (max-width:620px) {
             /* For mobile phones: */
-            .menu, .main{
-            width:100%;
+            .menu{
+                width:20%;
+            } .main{
+                width:80%;
             }
         }
 
@@ -161,17 +163,15 @@ function clue2() {
                     if (data.result == "1") {
                         $("#C3").text("一轮搜证开始！");
                         $("#p1, #p2, #p3").removeClass("btn-off");
+                        clearTimeout(time1);
                     } else {
                         $("#C3").text("搜证未开始，请等待...");
+                        time1 = setTimeout(round1, 1000);
                     }
                 },
                 error: function round1_e() {
                     $("#p1, #p2, #p3").style.background = "red";
                 },
-                complete: function round1_c() {
-                    time1 = setTimeout(round1, 1000);
-                    $("#btn2").click(function() {clearTimeout(time1);});
-                }
             });
         }, 1000);
     }
@@ -189,16 +189,15 @@ function clue2() {
                 success: function round2_s(data) {
                         if (data.result=="1") {
                             $("#C3").text("二轮搜证开始！");
+                            clearTimeout(time2);
                         } else {
                             $("#C3").text("搜证未开始，请等待...");
+                            time2 = setTimeout(round2,1000);
                         }
                     },
                 error: function round2_e() {
                     $("#p1, #p2, #p3").style.background = "red";
                 },
-                complete: function round2_c() {
-                    time2 = setTimeout(round2,1000);
-                }
             });
         }, 1000);
     };
