@@ -9,13 +9,16 @@ error_messages = {0: "该用户不存在",
                   1: "该用户已存在",
                   2: "密码不正确",
                   3: "本轮搜证未开始",
-                  4: "您已选好角色"}
+                  4: "您已选好角色",
+                  5: "这不是您的角色，请不要作弊哦~",
+                  6: "该角色不存在"}
 
 
 def new_user(i, p):
     from database import user
+    import database
     if i not in user.keys():
-        database.create_us
+        database.create_user(i, p)
         return True
     else:
         return False
