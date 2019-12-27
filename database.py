@@ -1,18 +1,17 @@
 # assume ap is the same for round1 and round2
 
-global user, game, track
+global user, game
 user = {}
-track = {}
 
 
 def create_user(user_id, pw):
     global user, game
-    user = {user_id: {'pw': pw,
-                      'char': None,
-                      'ap': game['round_ap'],
-                      'clue': {},
-                      'round': {1: False, 2: False}
-                      }}
+    user[user_id] = {'pw': pw,
+                     'char': {'name': None, 'story': None},
+                     'ap': game['round_ap'],
+                     'clue': {},
+                     'round': {1: False, 2: False}
+                     }
     print('User account created for {}.'.format(user_id))
     return user
 
@@ -26,7 +25,8 @@ def create_user(user_id, pw):
 
 
 def add_char(user_id, char):
-    global user, track
+    from create_game import track
+    global user
     user[user_id]['char'] = char
     track['chars'][char] = True
     print('User {} has chosen character {}'.format(user_id, char))
@@ -56,7 +56,7 @@ def sbtr_ap():
 
 
 def publicize(place, clue):
-    global track
+    from create_game import track
     pass
 
 
