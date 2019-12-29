@@ -1,7 +1,7 @@
 # test database
 import pytest
 
-'''
+"""
 @pytest.mark.parametrize("user_id, pw, expected", [
     ('heidi',
      '1234',
@@ -29,9 +29,10 @@ import pytest
 def test_create_user(user_id, pw, expected):
     from database import create_user
     user_dict = create_user(user_id, pw)
-    assert user_dict == expected
+    assert user_dict == expected"""
 
 
+"""
 @pytest.mark.parametrize("user_id, char, expected_user, expected_track", [
     ('lucy',
      'A',
@@ -68,5 +69,4 @@ def test_add_char(user_id, char, expected_user, expected_track):
     from database import add_char
     user, track = add_char(user_id, char)
     assert user == expected_user and \
-        track['chars'] == expected_track
-'''
+        track['chars'] == expected_track"""
