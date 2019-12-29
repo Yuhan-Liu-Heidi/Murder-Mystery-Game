@@ -186,16 +186,23 @@ function hide() {
         var str_index = event.srcElement.id;
         var index = str_index.charAt(str_index.length-2)+str_index.charAt(str_index.length-1);
         var user_name = $("#u_name").text().trim();
-        var clue_index = "#clues_in_p"+index;
+        var p_index = "#clues_in_p"+index;
         var x = document.getElementById("col"+index);
         $.ajax({
             url: "/find_clue/",
             type: "get",
             data: {name_find_clue1: user_name, name_place: str_index},
             success: function (data) {
-                $(clue_index).append("<li>data.clue</li>");
-                if (data.hidden==true) {
-                    $(clue_index).append("<button>深入线索</button>");
+                var clue_index = ($(p_index+" li").length+1).toString();
+                var clue_id = index+"p"+clue_index+"c";
+                var release_button_id = index+"p"+clue_index+"b";
+                $(p_index).append($('<li />', {id: clue_id, text: clue_index+". "+data.clue,
+                    style: "display:inline-block;margin-right:20px;margin-bottom:10px"}));
+                $(p_index).append($('<button />', {id: release_button_id, text: "公开线索"}));
+                $(p_index).append("<br>");
+                if (data.hidden == true) {
+                    var hidden_button_id = index+"p"+clue_index+"bh";
+                    $(p_index).append($('<button />', {id: hidden_button_id, text: "深入线索", style: "display:block;margin-bottom:20px"}));
                 }
                 x.classList.toggle("active");
                 var content = x.nextElementSibling;

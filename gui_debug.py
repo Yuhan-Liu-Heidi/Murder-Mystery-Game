@@ -93,7 +93,7 @@ def start_round2():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p1=[1, 3], p2=[1, 4], p3=[0, 3])
+    return jsonify(p1=[2, 3], p2=[1, 4], p3=[0, 3])
 
 
 @app.route("/find_clue/")
