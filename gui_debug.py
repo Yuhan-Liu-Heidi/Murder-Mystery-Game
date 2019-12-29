@@ -98,11 +98,25 @@ def clue_num():
 
 @app.route("/find_clue/")
 def find_clue():
-    name = str(request.args.get("name_find_clue1")).lower()
+    name = str(request.args.get("name_find_clue")).lower()
     place = str(request.args.get("name_place")).lower()
     # somehow get the clue in someplace for someone
     # update numbers in place
-    return jsonify(u_name=name, place=place, clue="线索1", hidden=True)
+    return jsonify(clue="线索1", hidden=True)
+
+
+@app.route("/hidden_clue/")
+def hidden_clue():
+    name = str(request.args.get("name_find_clue")).lower()
+    clue = str(request.args.get("clue_for_hidden")).lower()
+    # somehow get the hidden clue as "深入线索1"
+    # is_hidden=True -> This hidden clue is still hidden
+    # is_hidden=False -> This hidden clue has been token
+    is_hidden = False
+    if is_hidden is True:
+        return jsonify(hidden_clue="深入线索1")
+    else:
+        return jsonify(hidden_clue=False)
 
 
 if __name__ == "__main__":

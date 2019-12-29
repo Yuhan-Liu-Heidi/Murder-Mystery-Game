@@ -191,22 +191,57 @@ function hide() {
         $.ajax({
             url: "/find_clue/",
             type: "get",
-            data: {name_find_clue1: user_name, name_place: str_index},
+            data: {name_find_clue: user_name, name_place: str_index},
             success: function (data) {
                 var clue_index = ($(p_index+" li").length+1).toString();
+                if (clue_index.length<2) {
+                    clue_index = "0"+clue_index
+                }
                 var clue_id = index+"p"+clue_index+"c";
                 var release_button_id = index+"p"+clue_index+"b";
                 $(p_index).append($('<li />', {id: clue_id, text: clue_index+". "+data.clue,
-                    style: "display:inline-block;margin-right:20px;margin-bottom:10px"}));
+                    style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-top:10px"}));
                 $(p_index).append($('<button />', {id: release_button_id, text: "公开线索"}));
-                $(p_index).append("<br>");
+                //$(p_index).append("<br>");
                 if (data.hidden == true) {
                     var hidden_button_id = index+"p"+clue_index+"bh";
-                    $(p_index).append($('<button />', {id: hidden_button_id, text: "深入线索", style: "display:block;margin-bottom:20px"}));
+                    $(p_index).append($('<button />', {id: hidden_button_id, text: "深入", style: "display:block",
+                    onclick: "hidden_clue()"}));
                 }
                 x.classList.toggle("active");
                 var content = x.nextElementSibling;
                 content.style.maxHeight = content.scrollHeight + "px";
+            },
+        });
+    };
+
+    function hidden_clue() {
+        var clue_bid = event.srcElement.id;
+        var user_name = $("#u_name").text().trim();
+        var clue_id = clue_bid.replace("bh","c");
+        var clue = $("#"+clue_id).text().trim().slice(4);
+        var index = clue_bid.slice(0,2);
+        var x = document.getElementById("col"+index);
+        $.ajax({
+            url: "/hidden_clue/",
+            type: "get",
+            data: {name_find_clue: user_name, clue_for_hidden: clue},
+            success: function (data) {
+                if (data.hidden_clue != false) {
+                    var hidden_clue_id = clue_bid.replace("h","c");
+                    var hidden_release_button_id = clue_bid.replace("bh","bhc");
+                    $("#"+clue_bid).after($('<p />', {id: hidden_clue_id, text: data.hidden_clue,
+                    style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-left:2pc"}));
+                    $("#"+hidden_clue_id).after($('<button />', {id: hidden_release_button_id, text: "公开线索"}));
+                    $("#"+hidden_release_button_id).after("<br>");
+                    $("#"+clue_bid).text("已深入");
+                    x.classList.toggle("active");
+                    var content = x.nextElementSibling;
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } else {
+                    alert("该线索已被深入")
+                    $("#"+clue_bid).text("已深入");
+                }
             },
         });
     };
