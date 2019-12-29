@@ -37,9 +37,18 @@ def login():
     return render_template("login.html", error=error_msg)
 
 
+@app.route("/is_chosen/")
+def ch_chosen():
+    from database import track
+    return jsonify(ch1=track['chars']['良小花'],
+                   ch2=track['chars']['良星星'],
+                   ch3=track['chars']['米亚伦'],
+                   ch4=True, ch5=True,
+                   ch6=True, ch7=True, ch8=True, ch9=True, ch10=True)
+
+
 @app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
 def choose_ch(u_name):
-    import database
     if request.method == "POST":
         ch_name = request.form["choose_ch"]
         ch_added = server.new_ch(u_name, ch_name)
@@ -47,9 +56,7 @@ def choose_ch(u_name):
             return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
         elif not ch_added:
             message = "此角色已被选择"
-            # return render_template("choose_ch.html", msg=message)
-            print("此处会有通知无法选择")
-            return render_template("choose_ch.html")
+            return render_template("choose_ch.html", message=message)
         else:
             return redirect(url_for("play", u_name=u_name, ch_name=ch_added))
     else:
