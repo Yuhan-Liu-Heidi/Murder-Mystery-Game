@@ -246,15 +246,60 @@ function hide() {
         });
     };
 
+    function update_revealed_clues() {
+        $.ajax({
+            url: "/update_revealed_clues/",
+            type: "get",
+            success: function (data) {
+                var num = Object.keys(data).length;
+                var i,j;
+                for (i = 1; i <= num; i++) {
+                    if (i < 10) {
+                        var data_key = "0" + i.toString()
+                    } else {
+                        var data_key = i.toString()
+                    }
+                    $("#revealed_clues_in_p" + data_key).empty();
+                    $("#test").text(data["p03"].length);
+                    if (data["p"+data_key].length!=0) {
+                        var x = document.getElementById("revealed_col"+data_key);
+                        for (j = 0; j < data["p"+data_key].length; j++) {
+                            $("#revealed_clues_in_p"+data_key).append($('<li />', {text: data["p"+data_key][j][0],
+                                style: "margin-right:20px;margin-bottom:10px;margin-top:10px"}));
+                            if (data["p"+data_key][j].length!=0) {
+                                if (data["p"+data_key][j][1]!=false) {
+                                    $("#revealed_clues_in_p"+data_key).append($('<p />', {text: data["p"+data_key][j][1],
+                                        style: "margin-right:20px;margin-bottom:10px;margin-left:2pc"}));
+                                } else {
+                                    if (j+1 < 10) {
+                                        var clue_index = "0" + (j+1).toString()
+                                    } else {
+                                        var clue_index = (j+1).toString()
+                                    }
+                                    var hidden_button_id = data_key+"p"+clue_index+"bh";
+                                    $("#revealed_clues_in_p"+data_key).append($('<button />', {id: hidden_button_id, text: "深入", style: "display:block",
+                                        onclick: "hidden_clue()"}));
+                                }
+                            }
+                        }
+                    }
+                    x.classList.toggle("active");
+                    var content = x.nextElementSibling;
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            },
+        });
+    };
+
     $(document).ready(setInterval(function(){
         $("*").mouseenter(function(){
             $.get("/clue_num/", function(data){
-                $("#p_num1").text(data.p1[0]);
-                $("#p_num_total1").text(data.p1[1]);
-                $("#p_num2").text(data.p2[0]);
-                $("#p_num_total2").text(data.p2[1]);
-                $("#p_num3").text(data.p3[0]);
-                $("#p_num_total3").text(data.p3[1]);
+                $("#p_num1").text(data.p01[0]);
+                $("#p_num_total1").text(data.p01[1]);
+                $("#p_num2").text(data.p02[0]);
+                $("#p_num_total2").text(data.p02[1]);
+                $("#p_num3").text(data.p03[0]);
+                $("#p_num_total3").text(data.p03[1]);
             });
         });
     },1000));
@@ -299,26 +344,21 @@ function hide() {
         </div>
 
         <div style="float:left;width:50%">
-            <p>公开证据</p>
-            <button class="collapsible">地点1</button>
+            <p style="display: inline-block">公开证据</p>
+            <button id="update_revealed_clues" onclick="update_revealed_clues()">刷新公开证据</button>
+            <button id="revealed_col01" class="collapsible">地点1</button>
             <div class="content">
-                <ol>
-                    <li>证据</li>
-                    <li>证据</li>
+                <ol id="revealed_clues_in_p01">
                 </ol>
             </div>
-            <button class="collapsible">地点2</button>
+            <button id="revealed_col02" class="collapsible">地点2</button>
             <div class="content">
-                <ol>
-                    <li>证据</li>
-                    <li>证据</li>
+                <ol id="revealed_clues_in_p02">
                 </ol>
             </div>
-            <button class="collapsible">地点3</button>
+            <button id="revealed_col03" class="collapsible">地点3</button>
             <div class="content">
-                <ol>
-                    <li>证据</li>
-                    <li>证据</li>
+                <ol id="revealed_clues_in_p03">
                 </ol>
             </div>
         </div>

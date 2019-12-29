@@ -93,7 +93,7 @@ def start_round2():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p1=[2, 3], p2=[1, 4], p3=[0, 3])
+    return jsonify(p01=[2, 3], p02=[1, 4], p03=[0, 3])
 
 
 @app.route("/find_clue/")
@@ -117,6 +117,12 @@ def hidden_clue():
         return jsonify(hidden_clue="深入线索1")
     else:
         return jsonify(hidden_clue=False)
+
+
+@app.route("/update_revealed_clues/")
+def update_revealed_clues():
+    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
+                   p02=[["证据2", False], ["证据2"]], p03=[])
 
 
 if __name__ == "__main__":
