@@ -1,5 +1,6 @@
 # assume ap is the same for round1 and round2
 import json
+from create_game import track
 global user, game
 user = {}
 
@@ -38,11 +39,11 @@ def create_user(user_id, pw):
 
 
 def add_char(user_id, char):
-    from create_game import track
     global user
     user[user_id]['char'] = char
     track['chars'][char] = True
     print('User {} has chosen character {}'.format(user_id, char))
+    print(track)
     return user, track
 
 
