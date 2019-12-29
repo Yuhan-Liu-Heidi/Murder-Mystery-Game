@@ -93,16 +93,36 @@ def start_round2():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p1=[1, 3], p2=[1, 4], p3=[0, 3])
+    return jsonify(p01=[2, 3], p02=[1, 4], p03=[0, 3])
 
 
 @app.route("/find_clue/")
 def find_clue():
-    name = str(request.args.get("name_find_clue1")).lower()
+    name = str(request.args.get("name_find_clue")).lower()
     place = str(request.args.get("name_place")).lower()
     # somehow get the clue in someplace for someone
     # update numbers in place
-    return jsonify(u_name=name, place=place, clue="线索1", hidden=True)
+    return jsonify(clue="线索1", hidden=True)
+
+
+@app.route("/hidden_clue/")
+def hidden_clue():
+    name = str(request.args.get("name_find_clue")).lower()
+    clue = str(request.args.get("clue_for_hidden")).lower()
+    # somehow get the hidden clue as "深入线索1"
+    # is_hidden=True -> This hidden clue is still hidden
+    # is_hidden=False -> This hidden clue has been token
+    is_hidden = False
+    if is_hidden is True:
+        return jsonify(hidden_clue="深入线索1")
+    else:
+        return jsonify(hidden_clue=False)
+
+
+@app.route("/update_revealed_clues/")
+def update_revealed_clues():
+    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
+                   p02=[["证据2", False], ["证据2"]], p03=[])
 
 
 if __name__ == "__main__":
