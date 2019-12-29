@@ -66,10 +66,7 @@ def user_ready(u_id, n_rnd):
 def start_rnd(n_rnd, u_id):
     from database import user, game, track_round
     track_round(u_id, n_rnd)
-    print(user)
     n_start = sum([user[x]["round"][n_rnd] for x in user])
-    print(n_start)
-    print(game["player_num"])
     if n_start < game["player_num"]:
         return False
     else:
