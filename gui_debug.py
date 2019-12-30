@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
+import logging
 
 app = Flask(__name__)
 
@@ -64,6 +65,21 @@ def play(u_name, ch_name):
     if request.method == "GET":
         message = {"u_name": u_name, "ch_name": ch_name}
         return render_template("play.html", msg_info=message)
+    elif request.method == "POST":
+        # is_voted=False -> u_name has not voted.
+        # is_voted=True -> u_name has voted.
+        is_voted = False
+        if is_voted is False:
+            vote_name = request.form["vote"]
+            # u_name+vote_name->save to database, go to the ending page
+            logging.info("* {} has been voted."
+                         .format(vote_name))
+            return redirect(url_for("ending"))
+        else:
+            # do nothing just go to the ending page
+            return redirect(url_for("ending"))
+    else:
+        return render_template("play.html")
 
 
 @app.route("/start_round1/")
@@ -133,7 +149,6 @@ def update_revealed_clues():
 @app.route("/release_clue/")
 def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
-    # somehow get the hidden clue as "深入线索1"
     # is_release=True -> This clue has been released
     # is_release=False -> This clue has not been released
     is_release = True
@@ -143,5 +158,48 @@ def release_clue():
         return jsonify(status="failure")
 
 
+@app.route("/ch_names/")
+def ch_names():
+    return jsonify(ch_names=["零", "111", "222", "333", "444",
+                             "555", "666", "777", "888", "999"])
+
+
+@app.route("/ending/")
+def ending():
+    return render_template("ending.html")
+
+
+@app.route("/vote_result/")
+def vote_result():
+    # ch1=["333", ["666"]]
+    # => ch1 name is "333" and he now has 1 vote from "666".
+    return jsonify(ch1=["111", []],
+                   ch2=["222", ["111", "444", "555", "999", "000"]],
+                   ch3=["333", ["666"]], ch4=["444", ["222"]], ch5=["555", []],
+                   ch6=["666", ["333"]], ch7=["777", ["888"]],
+                   ch8=["888", ["777"]], ch9=["999", []], ch10=["000", []])
+
+
+@app.route("/final_result/")
+def final_result():
+    # if the vote has not finished,
+    # return jsonify(revealed=False, vote_murder=None,
+    #                true_murder=None, result=None)
+    # if everyone voted, then revealed=True and get the variables below.
+    vote_murder = "222"
+    true_murder = "111"
+    result = "Success"
+    return jsonify(revealed=True, vote_murder=vote_murder,
+                   true_murder=true_murder, result=result)
+
+
+def init_server():
+    logging.basicConfig(filename='image_server.log',
+                        level=logging.INFO,
+                        filemode='w')
+    return None
+
+
 if __name__ == "__main__":
+    init_server()
     app.run(debug=True)

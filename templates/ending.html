@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 15px;
+    text-align: left;
+    width: max-content;
+}
+table#t01 tr:nth-child(even) {
+    background-color: #eee;
+}
+table#t01 tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#t01 th {
+    background-color: #555555;
+    color: white;
+}
+
+.glow1 {
+    font-size: 80px;
+    color: #fff;
+    text-align: left;
+    -webkit-animation: glow1 1s ease-in-out infinite alternate;
+    -moz-animation: glow1 1s ease-in-out infinite alternate;
+    animation: glow1 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow1 {
+    from {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e6080c, 0 0 40px #e6080c, 0 0 50px #e6080c, 0 0 60px #e6080c, 0 0 70px #e6080c;
+    }
+
+    to {
+        text-shadow: 0 0 20px #fff, 0 0 30px #ff4585, 0 0 40px #ff4585, 0 0 50px #ff4585, 0 0 60px #ff4585, 0 0 70px #ff4585, 0 0 80px #ff4585;
+    }
+}
+
+.glow2 {
+    font-size: 80px;
+    color: #fff;
+    text-align: left;
+    -webkit-animation: glow2 1s ease-in-out infinite alternate;
+    -moz-animation: glow2 1s ease-in-out infinite alternate;
+    animation: glow2 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow2 {
+    from {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #4CAF50, 0 0 40px #4CAF50, 0 0 50px #4CAF50, 0 0 60px #4CAF50, 0 0 70px #4CAF50;
+    }
+
+    to {
+        text-shadow: 0 0 20px #fff, 0 0 30px #72ff71, 0 0 40px #72ff71, 0 0 50px #72ff71, 0 0 60px #72ff71, 0 0 70px #72ff71, 0 0 80px #72ff71;
+    }
+}
+</style>
+</head>
+<body>
+
+<h2>Result</h2>
+<button onclick="update_vote()">刷新结果</button>
+<table id="t01"></table>
+
+<p id="vote_murder" style="display: none"></p>
+<p id="true_murder" style="display: none"></p>
+<p id="result" style="display: none"></p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    function update_vote() {
+        $.ajax({
+            url: "/vote_result/",
+            type: "get",
+            success: function (data) {
+                $("#t01").empty();
+                var ch_list = Object.keys(data);
+                var k,i,j;
+                $("#t01").append("<tr><th>玩家</th><td>总票数</td></tr>");
+                for (k = 0; k < ch_list.length; k++) {
+                    $("#t01").append($('<tr />', {id: "rch"+k.toString()}));
+                    $("#rch"+k.toString()).append($('<th />', {id: "ch"+k.toString(), text: data[ch_list[k]][0]}));
+                    $("#ch"+k.toString()).after($('<td />', {id: "vote"+k.toString(), text: "0"}));
+                }
+                for (i = 0; i < ch_list.length; i++) {
+                    if (data[ch_list[i]][1].length != 0 ) {
+                        for (j = 0; j < data[ch_list[i]][1].length; j++) {
+                            $("#vote"+i.toString()).after($('<td />', {text: data[ch_list[i]][1][j]}));
+                        }
+                        $("#vote"+i.toString()).text(data[ch_list[i]][1].length.toString());
+                    }
+                }
+            },
+        });
+    }
+
+    $(document).ready(setInterval(function(){
+        $("*").mouseenter(function(){
+            $.get("/final_result/", function(data){
+                if (data.revealed == true) {
+                    var x = document.getElementById("vote_murder");
+                    var y = document.getElementById("true_murder");
+                    var z = document.getElementById("result");
+                    x.textContent = "票决凶手： "+data.vote_murder;
+                    y.textContent = "真凶： "+data.true_murder;
+                    z.textContent = data.result;
+                    x.style.display = "block";
+                    y.style.display = "block";
+                    z.style.display = "block";
+                    if (data.result.toLowerCase() == "success") {
+                        z.className = "glow2";
+                    } else {
+                        z.className = "glow1";
+                    }
+                }
+            });
+        });
+    },1000));
+
+
+</script>
+</body>
+</html>

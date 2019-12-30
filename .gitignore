@@ -3,3 +3,4 @@ venv
 __pycache__
 .DS_Store
 templates/.DS_Store
+image_server.log

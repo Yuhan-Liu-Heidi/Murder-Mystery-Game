@@ -112,6 +112,7 @@ function hide() {
         <a href="#C2">故事</a>
         <a href="#C3">搜证</a>
         <a href="#C4">证据</a>
+        <a href="#C5">投票</a>
     </div>
 </div>
 
@@ -436,7 +437,6 @@ function hide() {
         </div>
     </div>
     <hr>
-    <br>
 
 <script>
     function expand_all() {
@@ -477,6 +477,31 @@ for (i = 0; i < coll.length; i++) {
 }
 </script>
 
+    <hr>
+    <h3 id="C5">投票</h3>
+    <p id="test"></p>
+    <form id="vote" action="" method="post">
+    </form>
+
+    <script>
+        $(document).ready(function(){
+            $.get("/ch_names/", function(data){
+                var i;
+                for (i = 0; i < data.ch_names.length; i++) {
+                    $("#vote").append($('<input />', {type: "radio", name:"vote",
+                        id: data.ch_names[i], value: data.ch_names[i]}));
+                    $("#vote").append($('<label />', {for: data.ch_names[i], text: data.ch_names[i],
+                        style: "margin-left:10px"}));
+                    $("#vote").append("<br>");
+                }
+                $("#vote").append("<br>");
+                $("#vote").append($('<input />', {type: "submit",value: "Submit",
+                    onclick:"if (confirm('Are you sure?')) { this.form.submit();} else { return false; }"}));
+            });
+        });
+    </script>
+
+    <br>
     </div>
 </div>
 
