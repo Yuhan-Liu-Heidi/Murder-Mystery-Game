@@ -112,7 +112,7 @@ def hidden_clue():
     # somehow get the hidden clue as "深入线索1"
     # is_hidden=True -> This hidden clue is still hidden
     # is_hidden=False -> This hidden clue has been token
-    is_hidden = False
+    is_hidden = True
     if is_hidden is True:
         return jsonify(hidden_clue="深入线索1")
     else:

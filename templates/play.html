@@ -340,7 +340,8 @@ function hide() {
     </ul>
 
     <hr>
-    <h3 id="C4">证据</h3>
+    <h3 id="C4" style="display: inline-block">证据</h3>
+    <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
     <div>
         <div style="float:left;width:50%">
             <p>已搜证据</p>
@@ -385,6 +386,29 @@ function hide() {
     <br>
 
 <script>
+    function expand_all() {
+        var coll = document.getElementsByClassName("collapsible");
+        var expand_btn = document.getElementById("expand_all");
+        var i;
+        if (expand_btn.value == "0"){
+            for (i = 0; i < coll.length; i++) {
+                coll[i].classList.toggle("active");
+                var content = coll[i].nextElementSibling;
+                content.style.maxHeight = null;
+                expand_btn.textContent = "全部展开";
+                expand_btn.value = "1";
+            }
+        } else {
+            for (i = 0; i < coll.length; i++) {
+                coll[i].classList.toggle("active");
+                var content = coll[i].nextElementSibling;
+                content.style.maxHeight = content.scrollHeight + "px";
+                expand_btn.textContent = "全部收起";
+                expand_btn.value = "0";
+            }
+        }
+    }
+
 var coll = document.getElementsByClassName("collapsible");
 var i;
 for (i = 0; i < coll.length; i++) {
