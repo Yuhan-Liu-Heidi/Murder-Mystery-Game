@@ -93,7 +93,12 @@ def start_round2():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(ap=12, p01=[2, 3], p02=[1, 4], p03=[0, 3])
+    return jsonify(p01=[2, 3], p02=[1, 4], p03=[0, 3])
+
+
+@app.route("/ap_num/", methods=["POST"])
+def ap_num():
+    return jsonify(ap=12)
 
 
 @app.route("/find_clue/")
@@ -122,7 +127,20 @@ def hidden_clue():
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
     return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
-                   p02=[["证据2", False], ["证据2"]], p03=[])
+                   p02=[["证据3", False], ["证据4", False]], p03=[])
+
+
+@app.route("/release_clue/")
+def release_clue():
+    clue = str(request.args.get("clue_to_release")).lower()
+    # somehow get the hidden clue as "深入线索1"
+    # is_release=True -> This clue has been released
+    # is_release=False -> This clue has not been released
+    is_release = True
+    if is_release is False:
+        return jsonify(status=clue)
+    else:
+        return jsonify(status=clue)
 
 
 if __name__ == "__main__":
