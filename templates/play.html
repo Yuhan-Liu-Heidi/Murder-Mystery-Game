@@ -304,8 +304,8 @@ function hide() {
             data: {clue_to_release: clue},
             success: function (data) {
                 $("#"+clue_bid).text("已公开");
-                if (data.status == clue) {
-                    alert(clue);
+                if (data.status == "failure") {
+                    alert("该线索已被玩家公开");
                 }
             },
         });

@@ -138,9 +138,9 @@ def release_clue():
     # is_release=False -> This clue has not been released
     is_release = True
     if is_release is False:
-        return jsonify(status=clue)
+        return jsonify(status="success")
     else:
-        return jsonify(status=clue)
+        return jsonify(status="failure")
 
 
 if __name__ == "__main__":
