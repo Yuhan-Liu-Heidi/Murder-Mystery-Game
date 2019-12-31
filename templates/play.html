@@ -489,8 +489,8 @@ for (i = 0; i < coll.length; i++) {
                 var i;
                 for (i = 0; i < data.ch_names.length; i++) {
                     $("#vote").append($('<input />', {type: "radio", name:"vote",
-                        id: data.ch_names[i], value: data.ch_names[i]}));
-                    $("#vote").append($('<label />', {for: data.ch_names[i], text: data.ch_names[i],
+                        id: data.ch_names[i][0], value: data.ch_names[i][0]}));
+                    $("#vote").append($('<label />', {for: data.ch_names[i][0], text: data.ch_names[i][0],
                         style: "margin-left:10px"}));
                     $("#vote").append("<br>");
                 }
