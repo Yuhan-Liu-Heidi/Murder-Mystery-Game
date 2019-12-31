@@ -75,107 +75,34 @@
 <h1 style="text-align:center">Profile Cards</h1>
 <hr>
 
-<div class="all">
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch1.jpeg") }}" alt="ch1" style="width:300px;height: 400px">
-        <h1>良小花</h1>
-        <p class="title">女，当红小花，演技派。</p>
-        <form action="" method="post">
-            <button id="choose_ch1" name="choose_ch" value="良小花" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src={{ url_for("static", filename="images/ch2.jpeg") }} alt="ch2" style="width:300px;height: 400px">
-        <h1>良星星</h1>
-        <p class="title">女，生日寿星。</p>
-        <form action="" method="post">
-            <button id="choose_ch2" name="choose_ch" value="良星星" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch3.jpeg") }}" alt="ch3" style="width:300px;height: 400px">
-        <h1>米亚伦</h1>
-        <p class="title">女，同班同学。</p>
-        <form action="" method="post">
-            <button id="choose_ch3" name="choose_ch" value="米亚伦" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch4.jpeg") }}" alt="ch4" style="width:300px;height: 400px">
-        <h1>黑轮海</h1>
-        <p class="title">女，同班同学。</p>
-        <form action="" method="post">
-            <button id="choose_ch4" name="choose_ch" value="黑轮海" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch5.jpeg") }}" alt="ch5" style="width:300px;height: 400px">
-        <h1>希嘻嘻</h1>
-        <p class="title">女，lo裙小能手，学生会主席。</p>
-        <form action="" method="post">
-            <button id="choose_ch5" name="choose_ch" value="希嘻嘻" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch6.jpeg") }}" alt="ch6" style="width:300px;height: 400px">
-        <h1>嵩主角</h1>
-        <p class="title">男，学校助教。</p>
-        <form action="" method="post">
-            <button id="choose_ch6" name="choose_ch" value="嵩主角" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch7.jpeg") }}" alt="ch7" style="width:300px;height: 400px">
-        <h1>大幂幂</h1>
-        <p class="title">女，好姐妹。</p>
-        <form action="" method="post">
-            <button id="choose_ch7" name="choose_ch" value="大幂幂" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-          <img src="{{ url_for("static", filename="images/ch8.jpeg") }}" alt="ch8" style="width:300px;height: 400px">
-          <h1>tc第二帅</h1>
-          <p class="title">男，tc第二帅2。</p>
-          <form action="" method="post">
-              <button id="choose_ch8" name="choose_ch" value="tc第二帅" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-          </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch9.jpeg") }}" alt="ch9" style="width:300px;height: 400px">
-        <h1>撒比尔</h1>
-        <p class="title">男，小矮人。</p>
-        <form action="" method="post">
-            <button id="choose_ch9" name="choose_ch" value="撒比尔" onclick="if (confirm('Are you sure?')) { this.form.submit(); } else { return false; }">Choose</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <img src="{{ url_for("static", filename="images/ch10.jpeg") }}" alt="ch10" style="width:300px;height: 400px">
-        <h1>黄学</h1>
-        <p class="title">男，学长。</p>
-        <form action="" method="post">
-            <button id="choose_ch10" name="choose_ch" value="黄学" onclick="if (confirm('Are you sure?')) { this.form.submit();} else { return false; }">Choose</button>
-        </form>
-    </div>
-</div>
+<div class="all" id="ch"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
+    window.onload = $(document).ready(function(){
+        $.get("/ch_names/", function(data){
+            var i,str_i;
+            for (i = 0; i < data.ch_names.length; i++) {
+                str_i = (i+1).toString();
+                $("#ch").append($('<div />', {id: "div"+str_i, class: "card"}));
+                $("#div"+str_i).append($('<img />', {src: "../static/images/ch"+str_i+".jpeg", alt: "ch"+str_i,
+                    style: "width:300px;height:400px"}));
+                $("#div"+str_i).append($('<h1 />', {text: data.ch_names[i][0]}));
+                $("#div"+str_i).append($('<p />', {class: "title", text: data.ch_names[i][1]}));
+                $("#div"+str_i).append($('<form />', {id: "form"+str_i, action:"", method:"post"}));
+                $("#form"+str_i).append($('<button />', {id:"choose_ch"+str_i, name:"choose_ch", value:data.ch_names[i][0], text: "选择",
+                    onclick:"if (confirm('Are you sure?')) { this.form.submit();} else { return false; }"}));
+            }
+        });
+    });
+
     $(document).ready(setInterval(function(){
         $("*").mouseenter(function(){
             $.get("/is_chosen/", function(data){
-                var ch_list = ["ch1", "ch2", "ch3", "ch4", "ch5", "ch6", "ch7", "ch8", "ch9", "ch10"]
-                var i;
+                var i,x;
+                var ch_list = Object.keys(data);
                 for (i = 0; i < ch_list.length; i++) {
-                    var x = document.getElementById("choose_"+ch_list[i]);
+                    x = document.getElementById("choose_"+ch_list[i]);
                     if (data[ch_list[i]]==true) {
                         x.style.background = "#777777";
                     } else {
