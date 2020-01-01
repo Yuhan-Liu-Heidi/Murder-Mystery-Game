@@ -37,6 +37,11 @@ def login():
     return render_template("login.html", error=error_msg)
 
 
+@app.route("/ch_names/")
+def ch_names():
+    return jsonify(ch_names=["良小花", "良星星", "米亚伦"])
+
+
 @app.route("/is_chosen/")
 def ch_chosen():
     from database import track
@@ -98,6 +103,34 @@ def start_round1():
         return jsonify(result="1")
     else:
         return jsonify(result="0")
+
+
+@app.route("/vote_result/")
+def vote_result():
+    from server import calc_vote
+    result = calc_vote()
+    return result
+
+
+@app.route("/final_result/")
+def final_result():
+    from server import verify_vote, calc_vote, verify_murderer
+    vote_complete = verify_vote(1)
+    if vote_complete:
+        voted_murderer = calc_vote()
+        [result, true_murderer] = verify_murderer(voted_murderer)
+        return jsonify(revealed=True,
+                       vote_murder=voted_murderer,
+                       true_murder=true_murderer,
+                       result=result)
+    else:
+        return jsonify(revealed=False, vote_murder=None, true_murder=None,
+                       result=None)
+
+
+@app.route("/ending/")
+def ending():
+    return render_template("ending.html")
 
 
 if __name__ == "__main__":

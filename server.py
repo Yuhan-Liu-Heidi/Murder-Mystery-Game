@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from testdata import user, game
 
 
@@ -9,7 +9,6 @@ error_messages = {0: "该用户不存在",
                   1: "该用户已存在",
                   2: "密码不正确",
                   3: "本轮搜证未开始",
-                  4: "您已选好角色",
                   5: "这不是您的角色，请不要作弊哦~",
                   6: "该角色不存在"}
 
@@ -79,6 +78,32 @@ def search_clue(u_id, n_rnd, place):
         pass
     else:
         return error_messages[3]
+
+
+def verify_vote(n_rnd):
+    from database import game, track
+    n_voted = sum([user[x]["round"][n_rnd] for x in user])
+    if n_voted < game["player_num"]:
+        return False
+    else:
+        return True
+
+
+def calc_vote():
+    return jsonify(ch1=["111", []],
+                   ch2=["222", ["111", "444", "555", "999", "000"]],
+                   ch3=["333", ["666"]], ch4=["444", ["222"]], ch5=["555", []],
+                   ch6=["666", ["333"]], ch7=["777", ["888"]],
+                   ch8=["888", ["777"]], ch9=["999", []], ch10=["000", []])
+
+
+def verify_murderer(voted):
+    from database import game
+    true_murderer = game["murderer"]
+    if voted == true_murderer:
+        return [True, true_murderer]
+    else:
+        return [False, true_murderer]
 
 
 # @app.route("")
