@@ -52,14 +52,6 @@ def choose_ch(u_name):
         return render_template("choose_ch.html")
 
 
-@app.route("/is_chosen/")
-def is_chosen():
-    # ch1=False -> This ch1 has not been chosen
-    # ch1=True -> This ch1 has been chosen
-    return jsonify(ch1=False, ch2=False, ch3=True, ch4=True, ch5=True,
-                   ch6=True, ch7=True, ch8=True, ch9=True, ch10=True)
-
-
 @app.route("/<u_name>/play/<ch_name>/", methods=["GET", "POST"])
 def play(u_name, ch_name):
     if request.method == "GET":
@@ -160,8 +152,24 @@ def release_clue():
 
 @app.route("/ch_names/")
 def ch_names():
-    return jsonify(ch_names=["零", "111", "222", "333", "444",
-                             "555", "666", "777", "888", "999"])
+    return jsonify(ch_names=[["良小花", "女，当红小花，演技派。"],
+                             ["良星星", "女，生日寿星。"],
+                             ["米亚伦", "女，同班同学。"],
+                             ["黑轮海", "女，同班同学。"],
+                             ["希嘻嘻", "女，lo裙小能手，学生会主席。"],
+                             ["嵩主角", "男，学校助教。"],
+                             ["大幂幂", "女，好姐妹。"],
+                             ["tc第二帅", "男，tc第二帅2。"],
+                             ["撒比尔", "男，小矮人。"],
+                             ["黄学", "男，学长。"]])
+
+
+@app.route("/is_chosen/")
+def is_chosen():
+    # ch1=False -> This ch1 has not been chosen
+    # ch1=True -> This ch1 has been chosen
+    return jsonify(ch1=False, ch2=False, ch3=True, ch4=True, ch5=True,
+                   ch6=True, ch7=True, ch8=True, ch9=True, ch10=True)
 
 
 @app.route("/ending/")
