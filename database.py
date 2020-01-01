@@ -105,8 +105,8 @@ def create_game():
             'stories': {'A': 'A story (image path)',
                         'B': 'B story',
                         'C': 'C story'},
-            'player_num': 3  # input
-            }
+            'player_num': 3,
+            'murderer': '良小花'}
     return
 
 
