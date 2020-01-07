@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-from testdata import user, game
 
 
 app = Flask(__name__)
@@ -23,7 +22,6 @@ def new_user(i, p):
         return False
 
 
-# @app.route()
 def verify_user(i, p):
     from database import user
     try:
@@ -58,6 +56,7 @@ def verify_ch(i):
 
 
 def user_ready(u_id, n_rnd):
+    from database import user
     user[u_id]["round"][n_rnd] = True
     return
 
@@ -80,9 +79,9 @@ def search_clue(u_id, n_rnd, place):
         return error_messages[3]
 
 
-def verify_vote(n_rnd):
-    from database import game, track
-    n_voted = sum([user[x]["round"][n_rnd] for x in user])
+def verify_vote():
+    from database import game, user
+    n_voted = sum([user[x]["round"]["voted"] for x in user])
     if n_voted < game["player_num"]:
         return False
     else:
@@ -90,20 +89,34 @@ def verify_vote(n_rnd):
 
 
 def calc_vote():
-    return jsonify(ch1=["111", []],
-                   ch2=["222", ["111", "444", "555", "999", "000"]],
-                   ch3=["333", ["666"]], ch4=["444", ["222"]], ch5=["555", []],
-                   ch6=["666", ["333"]], ch7=["777", ["888"]],
-                   ch8=["888", ["777"]], ch9=["999", []], ch10=["000", []])
+    from database import vote
+    v_max = 0
+    for x in vote.keys():
+        if len(vote[x]) > v_max:
+            v_max = len(vote[x])
+    return [x for x in vote.keys() if len(vote[x]) == v_max]
+
+
+def disp_votes():
+    from database import vote
+    ch_list = [x for x in vote.keys()]
+    return jsonify(ch1=[ch_list[0], vote[ch_list[0]]],
+                   ch2=[ch_list[1], vote[ch_list[1]]],
+                   ch3=[ch_list[2], vote[ch_list[2]]],
+                   ch4=["弃权", vote[ch_list[3]]])
 
 
 def verify_murderer(voted):
     from database import game
+    # true_murderer = '良小花'
     true_murderer = game["murderer"]
-    if voted == true_murderer:
-        return [True, true_murderer]
+    if len(voted) == 1:
+        if voted == true_murderer:
+            return ["Success", true_murderer]
+        else:
+            return ["Failed", true_murderer]
     else:
-        return [False, true_murderer]
+        return ["平票", "???"]
 
 
 # @app.route("")

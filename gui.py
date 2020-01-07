@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 import server
+import logging
 
 
 app = Flask(__name__)
@@ -39,7 +40,17 @@ def login():
 
 @app.route("/ch_names/")
 def ch_names():
-    return jsonify(ch_names=["良小花", "良星星", "米亚伦"])
+    # temporarily hard coding
+    return jsonify(ch_names=[["良小花", "女，当红小花，演技派。"],
+                             ["良星星", "女，生日寿星。"],
+                             # ["黄学", "男，学长。"],
+                             # ["黑轮海", "女，同班同学。"],
+                             # ["希嘻嘻", "女，lo裙小能手，学生会主席。"],
+                             # ["嵩主角", "男，学校助教。"],
+                             # ["大幂幂", "女，好姐妹。"],
+                             # ["tc第二帅", "男，tc第二帅2。"],
+                             # ["撒比尔", "男，小矮人。"],
+                             ["米亚伦", "女，同班同学。"]])
 
 
 @app.route("/is_chosen/")
@@ -75,7 +86,7 @@ def choose_ch(u_name):
 
 @app.route("/<u_name>/play/<ch_name>", methods=["GET", "POST"])
 def play(u_name, ch_name):
-    from database import user, game
+    from database import user, game, vote
     from server import error_messages
     message = None
     if request.method == "GET":
@@ -88,18 +99,42 @@ def play(u_name, ch_name):
                 return error_messages[5]
             else:
                 return error_messages[6]
+    else:
+        try:
+            vote_name = request.form["vote"]
+        except Exception:
+            vote_name = None
+        vote[vote_name].append(ch_name)
+        user[u_name]["round"]["voted"] = True
+        return redirect(url_for("ending"))
+
+
+@app.route("/ending/")
+def ending():
+    return render_template("ending.html")
 
 
 @app.route("/start_round1/")
 def start_round1():
     from server import start_rnd
-    from database import user
     name1 = request.args.get("name_ready_for_1")
     u_id = str(name1).lower()
     # Receive the names that are ready.
     check = start_rnd(1, u_id)
-    print(check)
     if check:
+        return jsonify(result="1")
+    else:
+        return jsonify(result="0")
+
+
+@app.route("/start_round2/")
+def start_round2():
+    from server import start_rnd
+    name1 = request.args.get("name_ready_for_2")
+    u_id = str(name1).lower()
+    # Receive the names that are ready.
+    check = start_rnd(2, u_id)
+    if str(name1).lower() == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
@@ -107,15 +142,15 @@ def start_round1():
 
 @app.route("/vote_result/")
 def vote_result():
-    from server import calc_vote
-    result = calc_vote()
+    from server import disp_votes
+    result = disp_votes()
     return result
 
 
 @app.route("/final_result/")
 def final_result():
     from server import verify_vote, calc_vote, verify_murderer
-    vote_complete = verify_vote(1)
+    vote_complete = verify_vote()
     if vote_complete:
         voted_murderer = calc_vote()
         [result, true_murderer] = verify_murderer(voted_murderer)
@@ -126,11 +161,6 @@ def final_result():
     else:
         return jsonify(revealed=False, vote_murder=None, true_murder=None,
                        result=None)
-
-
-@app.route("/ending/")
-def ending():
-    return render_template("ending.html")
 
 
 if __name__ == "__main__":
