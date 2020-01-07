@@ -3,6 +3,7 @@ import json
 from create_game import track
 global user, game
 user = {}
+vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
 
 
 def rd_game():
@@ -24,7 +25,7 @@ def create_user(user_id, pw):
                      'char': None,
                      'ap': game['round_ap'],
                      'clue': {},
-                     'round': {1: False, 2: False}
+                     'round': {1: False, 2: False, "voted": False}
                      }
     print('User account created for {}.'.format(user_id))
     return user
@@ -100,15 +101,15 @@ def create_game():
                               'hidden of clue1 at p1'],
                              ['clue2 at p1 w/o hidden']],
                       'p2': [['1/1 clue at p2 ele1'],
-                             ['1/1 clue at p2 ele2']]
-                      },
+                             ['1/1 clue at p2 ele2']]},
             'stories': {'A': 'A story (image path)',
                         'B': 'B story',
                         'C': 'C story'},
-            'player_num': 3  # input
-            }
+            'player_num': 3,
+            'murderer': '良小花'}
     return
 
 
 if __name__ == "__main__":
     rd_game()
+    create_game()
