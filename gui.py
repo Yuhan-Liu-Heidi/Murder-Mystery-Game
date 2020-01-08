@@ -5,7 +5,7 @@ import logging
 
 app = Flask(__name__)
 
-
+# Part I: User sign-up and log-in
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.form:
@@ -16,14 +16,13 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    from server import error_messages
     error_msg = None
     if request.method == "POST":
         if request.form["action"] == "signup":
             signed_up = server.new_user(request.form["username"],
                                         request.form["psw"])
             if not signed_up:
-                error_msg = error_messages[1]
+                error_msg = server.error_messages[1]
             else:
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
@@ -38,6 +37,7 @@ def login():
     return render_template("login.html", error=error_msg)
 
 
+# Part II: User choose character
 @app.route("/ch_names/")
 def ch_names():
     # temporarily hard coding
@@ -77,18 +77,16 @@ def choose_ch(u_name):
             return redirect(url_for("play", u_name=u_name, ch_name=ch_added))
     else:
         ch_name = server.verify_ch(u_name)
-        print(ch_name)
         if type(ch_name) == str:
             return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
         else:
             return render_template("choose_ch.html")
 
 
+# Part III: Play page
 @app.route("/<u_name>/play/<ch_name>", methods=["GET", "POST"])
 def play(u_name, ch_name):
     from database import user, game, vote
-    from server import error_messages
-    message = None
     if request.method == "GET":
         ch = user[u_name]["char"]
         if ch_name == ch:
@@ -96,9 +94,9 @@ def play(u_name, ch_name):
             return render_template("play.html", msg_info=message)
         else:
             if ch_name in game['chars']:
-                return error_messages[5]
+                return server.error_messages[5]
             else:
-                return error_messages[6]
+                return server.error_messages[6]
     else:
         try:
             vote_name = request.form["vote"]
@@ -109,18 +107,25 @@ def play(u_name, ch_name):
         return redirect(url_for("ending"))
 
 
-@app.route("/ending/")
-def ending():
-    return render_template("ending.html")
+@app.route("/ap_num/", methods=["POST"])
+def ap_num():
+    from database import user
+    name = request.form["name"]  # ?
+    u_ap = user[name]["ap"]
+    return jsonify(ap=u_ap)
+
+
+@app.route("/clue_num/")
+def clue_num():
+    result = server.update_clue_num()
+    return result
 
 
 @app.route("/start_round1/")
 def start_round1():
-    from server import start_rnd
     name1 = request.args.get("name_ready_for_1")
     u_id = str(name1).lower()
-    # Receive the names that are ready.
-    check = start_rnd(1, u_id)
+    check = server.start_rnd(1, u_id)
     if check:
         return jsonify(result="1")
     else:
@@ -129,31 +134,80 @@ def start_round1():
 
 @app.route("/start_round2/")
 def start_round2():
-    from server import start_rnd
     name1 = request.args.get("name_ready_for_2")
     u_id = str(name1).lower()
-    # Receive the names that are ready.
-    check = start_rnd(2, u_id)
-    if str(name1).lower() == check:
+    check = server.start_rnd(2, u_id)
+    if check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
 
 
+@app.route("/find_clue/")
+def find_clue():
+    name = str(request.args.get("name_find_clue")).lower()
+    place = str(request.args.get("name_place")).lower()
+    [result, clue] = server.search_clue(name, place)
+    print("in function find_clue: {}, {}".format(result, clue))
+    if result:
+        if len(clue) == 1:
+            return jsonify(clue=clue, hidden=False)
+        else:
+            return jsonify(clue=clue, hidden=True)
+    else:
+        return
+
+
+@app.route("/hidden_clue/")
+def hidden_clue():
+    name = str(request.args.get("name_find_clue")).lower()
+    clue = str(request.args.get("clue_for_hidden")).lower()
+    # somehow get the hidden clue as "深入线索1"
+    # is_hidden=True -> This hidden clue is still hidden
+    # is_hidden=False -> This hidden clue has been token
+    is_hidden = True
+    if is_hidden:
+        return jsonify(hidden_clue="深入线索1")
+    else:
+        return jsonify(hidden_clue=False)
+
+
+@app.route("/update_revealed_clues/")
+def update_revealed_clues():
+    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
+                   p02=[["证据3", False], ["证据4", False]], p03=[])
+
+
+@app.route("/release_clue/")
+def release_clue():
+    clue = str(request.args.get("clue_to_release")).lower()
+    # is_release=True -> This clue has been released
+    # is_release=False -> This clue has not been released
+    is_release = True
+    if is_release is False:
+        return jsonify(status="success")
+    else:
+        return jsonify(status="failure")
+
+
+# Part IV: Vote
+@app.route("/ending/")
+def ending():
+    return render_template("ending.html")
+
+
 @app.route("/vote_result/")
 def vote_result():
-    from server import disp_votes
-    result = disp_votes()
+    result = server.disp_votes()
     return result
 
 
 @app.route("/final_result/")
 def final_result():
-    from server import verify_vote, calc_vote, verify_murderer
-    vote_complete = verify_vote()
+    vote_complete = server.verify_vote()
     if vote_complete:
-        voted_murderer = calc_vote()
-        [result, true_murderer] = verify_murderer(voted_murderer)
+        voted_murderer = server.calc_vote()
+        [result, true_murderer] = server.verify_murderer(voted_murderer)
         return jsonify(revealed=True,
                        vote_murder=voted_murderer,
                        true_murder=true_murderer,
