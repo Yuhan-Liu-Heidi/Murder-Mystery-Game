@@ -1,9 +1,14 @@
 # assume ap is the same for round1 and round2
 import json
-from create_game import track
 global user, game
 user = {}
 vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
+track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
+         'publicized_clue': {'p1': [['this is 1/2 clue at p1 ele1'],
+                                    ['this is 1/1 clue at p1 ele2']],
+                             'p2': [['this is 1/1 clue at p2 ele1']],
+                             'p3': [['this is 1/1 clue at p3']]},
+         'round': 0}
 
 
 def rd_game():
@@ -17,13 +22,14 @@ def rd_game():
 
 
 game = rd_game()
+game["murderer"] = "良小花"
 
 
 def create_user(user_id, pw):
     global user, game
     user[user_id] = {'pw': pw,
                      'char': None,
-                     'ap': game['round_ap'],
+                     'ap': game['round_ap']*2,
                      'clue': {},
                      'round': {1: False, 2: False, "voted": False}
                      }
@@ -44,7 +50,6 @@ def add_char(user_id, char):
     user[user_id]['char'] = char
     track['chars'][char] = True
     print('User {} has chosen character {}'.format(user_id, char))
-    print(track)
     return user, track
 
 
@@ -56,7 +61,6 @@ def clue_update(user_id, place):
     else:  # update user ap, clue
         add_clue()
         sbtr_ap()
-    print()
     return
 
 
@@ -112,4 +116,4 @@ def create_game():
 
 if __name__ == "__main__":
     rd_game()
-    create_game()
+    # create_game()
