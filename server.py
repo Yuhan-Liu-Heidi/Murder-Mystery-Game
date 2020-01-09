@@ -48,7 +48,6 @@ def new_ch(i, ch_name):
         return user[i]["char"]
     else:
         add_char(i, ch_name)
-        print(track)
         return True
 
 
