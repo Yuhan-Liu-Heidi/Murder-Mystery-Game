@@ -5,6 +5,7 @@ import logging
 
 app = Flask(__name__)
 
+
 # Part I: User sign-up and log-in
 @app.route("/", methods=["GET", "POST"])
 def home():
