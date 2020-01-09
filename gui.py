@@ -55,13 +55,15 @@ def ch_names():
 
 
 @app.route("/is_chosen/")
-def ch_chosen():
+def is_chosen():
     from database import track
-    return jsonify(ch1=track['chars']['良小花'],
+    print(track["chars"])
+    return jsonify(ch1=track['chars']['良小花'],  # Temp hard c
                    ch2=track['chars']['良星星'],
                    ch3=track['chars']['米亚伦'],
-                   ch4=True, ch5=True,
-                   ch6=True, ch7=True, ch8=True, ch9=True, ch10=True)
+                   # ch4=True, ch5=True,
+                   # ch6=True, ch7=True, ch8=True, ch9=True, ch10=True
+                   )
 
 
 @app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
