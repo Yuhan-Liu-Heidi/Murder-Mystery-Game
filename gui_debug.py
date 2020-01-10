@@ -203,7 +203,7 @@ def final_result():
 
 @app.route("/locations/")
 def locations():
-    return jsonify(l1="良小花", l2="良星星", l3="米亚伦11111111111111111111", l4="公共区域", l5="现场")
+    return jsonify(l1="良小花", l2="良星星", l3="米亚伦", l4="公共区域", l5="现场")
 
 
 def init_server():
