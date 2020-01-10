@@ -96,30 +96,26 @@ table#t01 th {
                 }
             },
         });
-    }
 
-    $(document).ready(setInterval(function(){
-        $("*").mouseenter(function(){
-            $.get("/final_result/", function(data){
-                if (data.revealed == true) {
-                    var x = document.getElementById("vote_murder");
-                    var y = document.getElementById("true_murder");
-                    var z = document.getElementById("result");
-                    x.textContent = "票决凶手： "+data.vote_murder;
-                    y.textContent = "真凶： "+data.true_murder;
-                    z.textContent = data.result;
-                    x.style.display = "block";
-                    y.style.display = "block";
-                    z.style.display = "block";
-                    if (data.result.toLowerCase() == "success") {
-                        z.className = "glow2";
-                    } else {
-                        z.className = "glow1";
-                    }
+        $.get("/final_result/", function (data) {
+            if (data.revealed == true) {
+                var x = document.getElementById("vote_murder");
+                var y = document.getElementById("true_murder");
+                var z = document.getElementById("result");
+                x.textContent = "票决凶手： " + data.vote_murder;
+                y.textContent = "真凶： " + data.true_murder;
+                z.textContent = data.result;
+                x.style.display = "block";
+                y.style.display = "block";
+                z.style.display = "block";
+                if (data.result.toLowerCase() == "success") {
+                    z.className = "glow2";
+                } else {
+                    z.className = "glow1";
                 }
-            });
+            }
         });
-    },1000));
+    }
 
 
 </script>

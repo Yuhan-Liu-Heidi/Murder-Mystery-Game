@@ -1,9 +1,3 @@
-<!--
-only one msg_info:
-{u_name:"lily",
- ch_name:"良星星"}
--->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,9 +92,9 @@ function hide() {
 
 <div style="background-color:#e5e5e5;padding:15px;text-align:center;">
     <h1 id="C1">剧本杀2333</h1>
-    <p>user id:</p>
+    <p style="display: inline">User ID:</p>
         {% if msg_info %}
-            <p id="u_name"> {{ msg_info["u_name"] }}</p>
+            <p id="u_name" style="display: inline-block"> {{ msg_info["u_name"] }}</p>
         {% endif %}
         <br>
     <label id="ap"></label>
@@ -128,12 +122,48 @@ function hide() {
     <img id="myImage" src="{{ url_for("static", filename=msg_info["ch_name"]+".jpg") }}" alt="story" style="display:none;">
     <hr>
 
+
     <h3 id="C3">搜证</h3>
     <button id="btn1" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round1(); } else { return false; }">一轮搜证</button>
     <button id="btn2" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round2(); } else { return false; }" style="display:none;">二轮搜证</button>
+    <br>
+    <br>
+    <table id="locations"></table>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
+    $(document).ready(function(){
+        $.get("/locations/", function(data){
+            var i, num;
+            var key_list = Object.keys(data);
+            for (i = 0; i < key_list.length; i++) {
+                if (i < 10) {
+                    num = "0"+(i+1).toString();
+                } else {
+                    num = (i+1).toString();
+                }
+                $("#locations").append($('<tr />', {id: "num_"+key_list[i]}));
+                $("#num_"+key_list[i]).append($('<td />', {id: key_list[i]}));
+                $("#"+key_list[i]).append($('<p />', {style: "display:inline", text: data[key_list[i]]+" "}));
+                $("#"+key_list[i]).append($('<p />', {id: "p_num"+num, style: "display:inline", text: "0"}));
+                $("#"+key_list[i]).append(" / ");
+                $("#"+key_list[i]).append($('<p />', {id: "p_num_total"+num, style: "display:inline", text: "0"}));
+                $("#num_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
+                $("#b"+key_list[i]).append($('<button />', {id: "p"+num, type:"text", class:"btn-off", style: "margin-left:10px",
+                    onclick:"find_clue()", text: "搜证"}));
+
+                $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", text:data[key_list[i]]}));
+                $("#own_clues").append($('<div />', {id:"clue_div"+num, class:"content"}));
+                $("#clue_div"+num).append($('<ol />', {id:"clues_in_p"+num}));
+
+                $("#revealed_clues").append($('<button />', {id:"revealed_col"+num, class:"collapsible", text:data[key_list[i]]}));
+                $("#revealed_clues").append($('<div />', {id:"revealed_clue_div"+num, class:"content"}));
+                $("#revealed_clue_div"+num).append($('<ol />', {id:"revealed_clues_in_p"+num}));
+
+            }
+        });
+    });
+
     function start_round1() {
         var x = document.getElementById("btn1");
         var y = document.getElementById("btn2");
@@ -149,7 +179,8 @@ function hide() {
                 success: function round1_s(data) {
                     if (data.result == "1") {
                         $("#C3").text("一轮搜证开始！");
-                        $("#p01, #p02, #p03").removeClass("btn-off");
+                        $("button").removeClass("btn-off");
+                        y.className= "btn-off";
                         clearTimeout(time1);
                     } else {
                         $("#C3").text("搜证未开始，请等待...");
@@ -357,15 +388,25 @@ function hide() {
         });
     };
 
-    $(document).ready(setInterval(function(){
-        $("*").mouseenter(function(){
+    window.onload = $(document).ready(function(){
+        var user_name = $("#u_name").text().trim();
+        $.post("/ap_num/",
+            {name: user_name},
+            function(data){
+            $("#ap").text("AP: "+data.ap);
+        });
+    });
+
+    $(document).ready(function(){
+        $("button").click(function(){
             $.get("/clue_num/", function(data){
-                $("#p_num1").text(data.p01[0]);
-                $("#p_num_total1").text(data.p01[1]);
-                $("#p_num2").text(data.p02[0]);
-                $("#p_num_total2").text(data.p02[1]);
-                $("#p_num3").text(data.p03[0]);
-                $("#p_num_total3").text(data.p03[1]);
+                var i, num;
+                var key_list = Object.keys(data);
+                for (i = 0; i < key_list.length; i++) {
+                    num = key_list[i].slice(1,3);
+                    $("#p_num"+num).text(data[key_list[i]][0]);
+                    $("#p_num_total"+num).text(data[key_list[i]][1]);
+                }
             });
             var user_name = $("#u_name").text().trim();
             $.post("/ap_num/",
@@ -374,66 +415,21 @@ function hide() {
                 $("#ap").text("AP: "+data.ap);
             });
         });
-    },1000));
+    });
     </script>
 
-
-    <ul>
-        <li><p id="p_name1" style="display:inline">房间</p>
-            <p id="p_num1" style="display:inline"></p>/
-            <p id="p_num_total1" style="display:inline"></p>
-            <button id="p01" type="text" class="btn-off" onclick="find_clue()">搜证</button></li>
-        <li><p id="p_name1" style="display:inline">客厅</p>
-            <p id="p_num2" style="display:inline"></p>/
-            <p id="p_num_total2" style="display:inline"></p>
-            <button id="p02" type="text" class="btn-off" onclick="find_clue()">搜证</button></li>
-        <li><p id="p_name1" style="display:inline">厨房</p>
-            <p id="p_num3" style="display:inline"></p>/
-            <p id="p_num_total3" style="display:inline"></p>
-            <button id="p03" type="text" class="btn-off" onclick="find_clue()">搜证</button></li>
-    </ul>
 
     <hr>
     <h3 id="C4" style="display: inline-block">证据</h3>
     <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
     <div>
-        <div style="float:left;width:50%">
+        <div style="float:left;width:50%" id="own_clues">
             <p>已搜证据</p>
-            <button id="col01" class="collapsible">地点1</button>
-            <div class="content">
-                <ol id="clues_in_p01">
-                </ol>
-            </div>
-            <button id="col02" class="collapsible">地点2</button>
-            <div class="content">
-                <ol id="clues_in_p02">
-                </ol>
-            </div>
-            <button id="col03" class="collapsible">地点3</button>
-            <div class="content">
-                <ol id="clues_in_p03">
-                </ol>
-            </div>
         </div>
 
-        <div style="float:left;width:50%">
+        <div style="float:left;width:50%" id="revealed_clues">
             <p style="display: inline-block">公开证据</p>
             <button id="update_revealed_clues" onclick="update_revealed_clues()">刷新公开证据</button>
-            <button id="revealed_col01" class="collapsible">地点1</button>
-            <div class="content">
-                <ol id="revealed_clues_in_p01">
-                </ol>
-            </div>
-            <button id="revealed_col02" class="collapsible">地点2</button>
-            <div class="content">
-                <ol id="revealed_clues_in_p02">
-                </ol>
-            </div>
-            <button id="revealed_col03" class="collapsible">地点3</button>
-            <div class="content">
-                <ol id="revealed_clues_in_p03">
-                </ol>
-            </div>
         </div>
     </div>
 

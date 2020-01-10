@@ -101,12 +101,12 @@ def start_round2():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p01=[2, 3], p02=[1, 4], p03=[0, 3])
+    return jsonify(p01=[3, 3], p02=[1, 4], p03=[0, 3])
 
 
 @app.route("/ap_num/", methods=["POST"])
 def ap_num():
-    return jsonify(ap=12)
+    return jsonify(ap=10)
 
 
 @app.route("/find_clue/")
@@ -199,6 +199,11 @@ def final_result():
     result = "Success"
     return jsonify(revealed=True, vote_murder=vote_murder,
                    true_murder=true_murder, result=result)
+
+
+@app.route("/locations/")
+def locations():
+    return jsonify(l1="良小花", l2="良星星", l3="米亚伦11111111111111111111", l4="公共区域", l5="现场")
 
 
 def init_server():
