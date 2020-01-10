@@ -142,13 +142,14 @@ function hide() {
                 } else {
                     num = (i+1).toString();
                 }
-                $("#locations").append($('<tr />', {id: "num_"+key_list[i]}));
-                $("#num_"+key_list[i]).append($('<td />', {id: key_list[i]}));
-                $("#"+key_list[i]).append($('<p />', {style: "display:inline", text: data[key_list[i]]+" "}));
+                $("#locations").append($('<tr />', {id: "cloumn_"+key_list[i]}));
+                $("#cloumn_"+key_list[i]).append($('<td />', {id: "name"+key_list[i]}));
+                $("#name"+key_list[i]).append($('<p />', {style: "display:inline;margin-right:20px", text: data[key_list[i]]}));
+                $("#cloumn_"+key_list[i]).append($('<td />', {id: key_list[i]}));
                 $("#"+key_list[i]).append($('<p />', {id: "p_num"+num, style: "display:inline", text: "0"}));
                 $("#"+key_list[i]).append(" / ");
                 $("#"+key_list[i]).append($('<p />', {id: "p_num_total"+num, style: "display:inline", text: "0"}));
-                $("#num_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
+                $("#cloumn_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
                 $("#b"+key_list[i]).append($('<button />', {id: "p"+num, type:"text", class:"btn-off", style: "margin-left:10px",
                     onclick:"find_clue()", text: "搜证"}));
 
