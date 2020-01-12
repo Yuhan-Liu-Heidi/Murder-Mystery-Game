@@ -29,7 +29,7 @@ def create_user(user_id, pw):
     global user, game
     user[user_id] = {'pw': pw,
                      'char': None,
-                     'ap': game['round_ap']*2,
+                     'ap': 0,
                      'clue': {},
                      'round': {1: False, 2: False, "voted": False}
                      }
