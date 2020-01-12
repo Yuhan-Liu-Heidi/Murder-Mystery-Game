@@ -150,19 +150,19 @@ def update_clue_num():
 
     :return: json containing the clue nums
     """
-    n_rnd = "round{}".format(db.track["round"])
-    if n_rnd is not 0:
+    if db.track["round"] == 0:
+        return jsonify(p01=[0, 0], p02=[0, 0], p03=[0, 0])
+    else:
+        n_rnd = "round{}".format(db.track["round"])
         n_c_p1 = len(db.game["clues"][n_rnd]["p01"])
         n_c_found_p1 = len(db.track["publicized_clue"]["p1"])  # Temp hard c
         n_c_p2 = len(db.game["clues"][n_rnd]["p02"])
         n_c_found_p2 = len(db.track["publicized_clue"]["p2"])  # Temp hard c
         n_c_p3 = len(db.game["clues"][n_rnd]["p03"])
         n_c_found_p3 = len(db.track["publicized_clue"]["p3"])  # Temp hard c
-    else:
-        return jsonify(p01=[0, 0], p02=[0, 0], p03=[0, 0])
-    return jsonify(p01=[n_c_found_p1, n_c_p1],
-                   p02=[n_c_found_p2, n_c_p2],
-                   p03=[n_c_found_p3, n_c_p3])
+        return jsonify(p01=[n_c_found_p1, n_c_p1],
+                       p02=[n_c_found_p2, n_c_p2],
+                       p03=[n_c_found_p3, n_c_p3])
 
 
 def verify_release(clue, place):
