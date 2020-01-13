@@ -152,7 +152,6 @@ function hide() {
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
                 $("#b"+key_list[i]).append($('<button />', {id: "p"+num, type:"text", class:"btn-off", style: "margin-left:10px",
                     onclick:"find_clue()", text: "搜证"}));
-
                 $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", text:data[key_list[i]]}));
                 $("#own_clues").append($('<div />', {id:"clue_div"+num, class:"content"}));
                 $("#clue_div"+num).append($('<ol />', {id:"clues_in_p"+num}));
@@ -189,6 +188,7 @@ function hide() {
                     }
                 },
             });
+            update_num();
         }, 1000);
     }
 
@@ -212,6 +212,7 @@ function hide() {
                         }
                     },
             });
+            update_num();
         }, 1000);
     };
 
@@ -250,6 +251,7 @@ function hide() {
                         x.classList.toggle("active");
                         var content = x.nextElementSibling;
                         content.style.maxHeight = content.scrollHeight + "px";
+                        update_num();
                     },
                 });
             } else {
@@ -315,6 +317,7 @@ function hide() {
                         alert("该线索已被深入");
                         $("#" + clue_bid).text("已深入");
                     }
+                    update_num();
                 },
             });
         } else {
@@ -389,17 +392,10 @@ function hide() {
         });
     };
 
-    window.onload = $(document).ready(function(){
-        var user_name = $("#u_name").text().trim();
-        $.post("/ap_num/",
-            {name: user_name},
-            function(data){
-            $("#ap").text("AP: "+data.ap);
-        });
-    });
+    window.onload = update_num();
 
-    $(document).ready(function(){
-        $("button").click(function(){
+    function update_num() {
+        $(document).ready(function(){
             $.get("/clue_num/", function(data){
                 var i, num;
                 var key_list = Object.keys(data);
@@ -416,7 +412,8 @@ function hide() {
                 $("#ap").text("AP: "+data.ap);
             });
         });
-    });
+    }
+
     </script>
 
 
@@ -477,7 +474,7 @@ for (i = 0; i < coll.length; i++) {
     <div style="float:left;width:100%">
         <hr>
         <h3 id="C5">投票</h3>
-        <form id="vote" action="" method="post">
+        <form id="vote" name="my_vote" action="" method="post" onsubmit="return validateForm()">
         </form>
     </div>
 
@@ -494,10 +491,20 @@ for (i = 0; i < coll.length; i++) {
                     $("#vote").append("<br>");
                 }
                 $("#vote").append("<br>");
-                $("#vote").append($('<input />', {type: "submit",value: "Submit",
-                    onclick:"if (confirm('Are you sure?')) { this.form.submit();} else { return false; }"}));
+                $("#vote").append($('<input />', {type: "submit",value: "Submit"}));
             });
         });
+
+    function validateForm() {
+        var x = document.forms["my_vote"]["vote"].value;
+        if (x == "") {
+            alert("请选择一名玩家投票！");
+            return false;
+        } else {
+            alert("是否确定最后凶手为："+x+"?");
+            return true;
+        }
+    }
     </script>
 
     <br>
