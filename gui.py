@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 import server
+import database as db
 import logging
 
 
@@ -20,12 +21,14 @@ def login():
     error_msg = None
     if request.method == "POST":
         if request.form["action"] == "signup":
-            signed_up = server.new_user(request.form["username"],
-                                        request.form["psw"])
+            u_id = request.form["username"]
+            u_pw = request.form["psw"]
+            signed_up = server.new_user(u_id, u_pw)
             if not signed_up:
                 error_msg = server.error_messages[1]
             else:
                 message = "You've signed up"
+                app.logger.info("User created: {}".format(u_id))
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
             logged_in = server.verify_user(request.form["username"],
@@ -56,11 +59,9 @@ def ch_names():
 
 @app.route("/is_chosen/")
 def is_chosen():
-    from database import track
-    print(track["chars"])
-    return jsonify(ch1=track['chars']['良小花'],  # Temp hard c
-                   ch2=track['chars']['良星星'],
-                   ch3=track['chars']['米亚伦'],
+    return jsonify(ch1=db.track['chars']['良小花'],  # Temp hard c
+                   ch2=db.track['chars']['良星星'],
+                   ch3=db.track['chars']['米亚伦'],
                    # ch4=True, ch5=True,
                    # ch6=True, ch7=True, ch8=True, ch9=True, ch10=True
                    )
@@ -72,6 +73,7 @@ def choose_ch(u_name):
         ch_name = request.form["choose_ch"]
         ch_added = server.new_ch(u_name, ch_name)
         if ch_added:
+            app.logger.info("User {} has chosen {}".format(u_name, ch_name))
             return redirect(url_for("play", u_name=u_name, ch_name=ch_name))
         elif not ch_added:
             message = "此角色已被选择"
@@ -89,14 +91,13 @@ def choose_ch(u_name):
 # Part III: Play page
 @app.route("/<u_name>/play/<ch_name>", methods=["GET", "POST"])
 def play(u_name, ch_name):
-    from database import user, game, vote
     if request.method == "GET":
-        ch = user[u_name]["char"]
+        ch = db.user[u_name]["char"]
         if ch_name == ch:
             message = {"u_name": u_name, "ch_name": ch_name}
             return render_template("play.html", msg_info=message)
         else:
-            if ch_name in game['chars']:
+            if ch_name in db.game['chars']:
                 return server.error_messages[5]
             else:
                 return server.error_messages[6]
@@ -105,16 +106,16 @@ def play(u_name, ch_name):
             vote_name = request.form["vote"]
         except Exception:
             vote_name = None
-        vote[vote_name].append(ch_name)
-        user[u_name]["round"]["voted"] = True
+        db.vote[vote_name].append(ch_name)  # 给db
+        db.user[u_name]["round"]["voted"] = True
+        app.logger.info("User {} voted {}".format(u_name, vote_name))
         return redirect(url_for("ending"))
 
 
 @app.route("/ap_num/", methods=["POST"])
 def ap_num():
-    from database import user
-    name = request.form["name"]  # ?
-    u_ap = user[name]["ap"]
+    name = request.form["name"]
+    u_ap = db.user[name]["ap"]
     return jsonify(ap=u_ap)
 
 
@@ -151,14 +152,13 @@ def find_clue():
     name = str(request.args.get("name_find_clue")).lower()
     place = str(request.args.get("name_place")).lower()
     [result, clue] = server.search_clue(name, place)
-    print("in function find_clue: {}, {}".format(result, clue))
     if result:
         if len(clue) == 1:
             return jsonify(clue=clue, hidden=False)
         else:
-            return jsonify(clue=clue, hidden=True)
+            return jsonify(clue=clue[0], hidden=True)
     else:
-        return
+        return clue
 
 
 @app.route("/hidden_clue/")
@@ -177,6 +177,7 @@ def hidden_clue():
 
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
+    # Temp hard coding
     return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
                    p02=[["证据3", False], ["证据4", False]], p03=[])
 
@@ -186,7 +187,7 @@ def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
     # is_release=True -> This clue has been released
     # is_release=False -> This clue has not been released
-    is_release = True
+    is_release = server.verify_release(clue)
     if is_release is False:
         return jsonify(status="success")
     else:
@@ -211,6 +212,8 @@ def final_result():
     if vote_complete:
         voted_murderer = server.calc_vote()
         [result, true_murderer] = server.verify_murderer(voted_murderer)
+        app.logger.info("Voting finished. Voted murderer: {}; Result: {}."
+                        .format(voted_murderer, result))
         return jsonify(revealed=True,
                        vote_murder=voted_murderer,
                        true_murder=true_murderer,
@@ -221,4 +224,7 @@ def final_result():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    # handler = logging.FileHandler('MMG_server.log', encoding='UTF-8')
+    # handler.setLevel(logging.INFO)
+    # app.logger.addHandler(handler)
+    app.run(debug=True)
