@@ -1,1 +1,18 @@
-{"chars": ["A", "B", "C"], "clues": {"round1": {"p01": [["clue1 at p1 w/ hidden", "hidden of clue1 at p1"], ["clue2 at p1 w/o hidden"]], "p02": [["clue1 at p2 w/o hidden"], ["clue2 at p2 w/o hidden"]], "p03": [["none"]]}, "round2": {"p01": [["clue1 at p1 w/ hidden", "hidden of clue1 at p1"], ["clue2 at p1 w/o hidden"]], "p02": [["clue1 at p2 w/o hidden"], ["clue2 at p2 w/o hidden"]]}}, "stories": {"A": "A story", "B": "B story", "C": "C story"}, "round_ap": 4, "player_num": 3}
+{"chars": ["A", "B", "C"],
+  "clues": {
+    "round1": {
+      "p01": ["c1.1.1_0 // c1.1.1_1", "c1.1.2_0"],
+      "p02": ["c1.2.1_0", "c1.2.2_0"],
+      "p03": ["c1.3.1_0", "c1.3.2_0"],
+      "p04": ["c1.4.1_0"],
+      "p05": ["c1.5.1_0 // c1.5.1_1"]},
+    "round2": {
+      "p01": ["c2.1.1_0 // c2.1.1_1", "c2.1.2_0"],
+      "p02": ["c2.2.1_0", "c2.2.2_0"],
+      "p03": ["c2.3.1_0"],
+      "p04": ["c2.4.1_0"],
+      "p05": ["c2.5.1_0"]}},
+  "stories": {"A": "A story", "B": "B story", "C": "C story"},
+  "round_ap": 4,
+  "player_num": 3,
+  "locations": ["p01", "p02", "p03", "p04", "p05"]}

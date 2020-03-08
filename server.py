@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+import numpy as np
 import database as db
 
 
@@ -13,7 +14,8 @@ error_messages = {0: "该用户不存在",
                   6: "该角色不存在",
                   7: "您不可以搜索自己的线索",
                   8: "您的AP不足",
-                  9: "该地点已无剩余线索"}
+                  9: "该地点已无剩余线索",
+                  10: "该线索已被深入"}
 
 
 # Part I: User sign-up and log-in
@@ -100,8 +102,13 @@ def start_rnd(n_rnd, u_id):
             return False
         else:
             db.track["round"] = n_rnd  # 给db
-            for x in db.user:  # 加ap 给db
-                db.user[x]["ap"] += db.game['round_ap']*2
+            rnd = "round{}".format(n_rnd)
+            for user in db.user:  # 加ap 给db
+                db.user[user]["ap"] += db.game['round_ap'] * 2
+            for place in db.game["locations"]:
+                for clue in db.game["clues"][rnd][place]:
+                    db.track["clues"][place].append(clue)  # 给db
+                print(db.track["clues"])
             return True
 
 
@@ -128,18 +135,13 @@ def search_clue(u_id, place):
         r_num = db.track["round"]
         if r_num == 0:
             return False, error_messages[3]
-        elif r_num == 1:
-            check = True  # Temp hard coding
-            if check:
-                clue = db.game["clues"]["round1"]["p01"][0]  # Temp hard coding
-                db.user[u_id]["ap"] -= 2  # 给db
-                return True, clue
-            else:
-                return False, error_messages[9]
         else:
-            check = True  # Temp hard coding
-            if check:
-                clue = db.game["clues"]["round2"]["p01"][0]  # Temp hard coding
+            if len(db.track["clues"][place]) is not 0:
+                clue = db.track["clues"][place][0]
+                db.track["clues"][place].remove(clue)  # 给db
+                if len(clue.split("//")) > 1:
+                    db.track["hidden"].append(clue.split("//")[1])  # 给db
+                db.user[u_id]["ap"] -= 2  # 给db
                 return True, clue
             else:
                 return False, error_messages[9]
@@ -150,35 +152,79 @@ def update_clue_num():
 
     :return: json containing the clue nums
     """
+    # found clue num | rnd1 clue num | rnd2 clue num
     if db.track["round"] == 0:
-        return jsonify(p01=[0, 0], p02=[0, 0], p03=[0, 0])
+        return
     else:
-        n_rnd = "round{}".format(db.track["round"])
-        n_c_p1 = len(db.game["clues"][n_rnd]["p01"])
-        n_c_found_p1 = len(db.track["publicized_clue"]["p1"])  # Temp hard c
-        n_c_p2 = len(db.game["clues"][n_rnd]["p02"])
-        n_c_found_p2 = len(db.track["publicized_clue"]["p2"])  # Temp hard c
-        n_c_p3 = len(db.game["clues"][n_rnd]["p03"])
-        n_c_found_p3 = len(db.track["publicized_clue"]["p3"])  # Temp hard c
-        return jsonify(p01=[n_c_found_p1, n_c_p1],
-                       p02=[n_c_found_p2, n_c_p2],
-                       p03=[n_c_found_p3, n_c_p3])
+        num_clue = np.zeros([len(db.game["locations"]), 3])
+        index = 0
+        rnd = db.track["round"]
+        for place in db.game["locations"]:
+            num_clue[index][1] = len(db.game["clues"]["round1"][place])
+            num_clue[index][2] = num_clue[index][1] + \
+                                 len(db.game["clues"]["round2"][place])
+            num_clue[index][0] = num_clue[index][rnd] - \
+                                 len(db.track["clues"][place])
+            index += 1
+        return jsonify(p01=[num_clue[0][0], num_clue[0][rnd]],
+                       p02=[num_clue[1][0], num_clue[1][rnd]],
+                       p03=[num_clue[2][0], num_clue[2][rnd]],
+                       p04=[num_clue[3][0], num_clue[3][rnd]],
+                       p05=[num_clue[4][0], num_clue[4][rnd]])
 
 
-def verify_release(clue, place):
+def verify_release(clue, place):  # BUG: cant get place
     """ Verify if a clue has been revealed
 
     :param clue: string containing the clue
+    :param place: string containing the place of the clue
     :return: boolean representing if the clue has been revealed
     """
     if clue in str(db.track["publicized_clue"][place]):
         return True
     else:
-        db.track["publicized_clue"][place].append([clue])
+        db.track["publicized_clue"][place].append([clue])  # 给db
         return False
 
 
-def verify_hidden(clue):
+def search_hidden_clue(u_id, clue, n_rnd):
+    """
+
+    :param u_id:
+    :param clue:
+    :param n_rnd:
+    :return:
+    """
+    u_ch = db.user[u_id]["char"]
+    u_ap = db.user[u_id]["ap"]
+    place = ""
+    hidden = ""
+    if u_ap <= 0:
+        return False, error_messages[8]
+    else:
+        rnd = "round{}".format(n_rnd)
+        for p in db.game["clues"][rnd].keys():
+            for c in db.game["clues"][rnd][p]:
+                print("Want to search hidden for {}".format(clue))
+                print("Comparing w/ {}".format(c.split("//")[0]))
+                if clue in c.split("//")[0]:
+                    hidden = c.split("//")[1]
+                    place = p
+                    break
+        if hidden == "" or place == "":
+            return False
+        if u_ch in place:
+            return False, error_messages[7]
+        else:
+            if hidden in db.track["hidden"]:
+                db.track["hidden"].remove(hidden)  # 给db
+                db.user[u_id]["ap"] -= 2  # 给db
+                return hidden
+            else:
+                return False, error_messages[10]
+
+
+def verify_hidden_for_release():
     pass
 
 

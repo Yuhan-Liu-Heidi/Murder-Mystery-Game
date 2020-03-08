@@ -4,10 +4,13 @@ global user, game
 user = {}
 vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
 track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
-         'publicized_clue': {'p1': [['this is 1/2 clue at p1 ele1'],
-                                    ['this is 1/1 clue at p1 ele2']],
-                             'p2': [['this is 1/1 clue at p2 ele1']],
-                             'p3': [['this is 1/1 clue at p3']]},
+         'publicized_clue': {'p01': [],
+                             'p02': [],
+                             'p03': [],
+                             'p04': [],
+                             'p05': []},
+         'clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []},
+         'hidden': [],
          'round': 0}
 
 
@@ -17,7 +20,6 @@ def rd_game():
     in_file = open(file_path, "r")
     game = json.load(in_file)
     in_file.close()
-    print(game)
     return game
 
 
