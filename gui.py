@@ -102,12 +102,9 @@ def play(u_name, ch_name):
             else:
                 return server.error_messages[6]
     else:
-        try:
-            vote_name = request.form["vote"]
-        except Exception:
-            vote_name = None
+        vote_name = request.form["vote"]
         db.vote[vote_name].append(ch_name)  # 给db
-        db.user[u_name]["round"]["voted"] = True
+        db.user[u_name]["round"]["voted"] = True  # 给db
         app.logger.info("User {} voted {}".format(u_name, vote_name))
         return redirect(url_for("ending"))
 
@@ -123,6 +120,11 @@ def ap_num():
 def clue_num():
     result = server.update_clue_num()
     return result
+
+
+@app.route("/locations/")
+def locations():
+    return jsonify(l1="良小花", l2="良星星", l3="米亚伦", l4="公共区域", l5="现场")
 
 
 @app.route("/start_round1/")
@@ -153,45 +155,48 @@ def find_clue():
     place = str(request.args.get("name_place")).lower()
     [result, clue] = server.search_clue(name, place)
     if result:
-        if len(clue) == 1:
-            return jsonify(clue=clue, hidden=False)
+        clue_release = clue.split('//')
+        if len(clue_release) == 1:
+            has_hidden = False
         else:
-            return jsonify(clue=clue[0], hidden=True)
+            has_hidden = True
+        return jsonify(clue=clue_release[0], hidden=has_hidden)
     else:
-        return clue
+        return
 
 
 @app.route("/hidden_clue/")
 def hidden_clue():
     name = str(request.args.get("name_find_clue")).lower()
     clue = str(request.args.get("clue_for_hidden")).lower()
-    # somehow get the hidden clue as "深入线索1"
-    # is_hidden=True -> This hidden clue is still hidden
-    # is_hidden=False -> This hidden clue has been token
-    is_hidden = True
-    if is_hidden:
-        return jsonify(hidden_clue="深入线索1")
+    n_round = db.track["round"]
+    hidden = server.search_hidden_clue(name, clue, n_round)
+    if type(hidden) == str:
+        return jsonify(hidden_clue=hidden)
     else:
-        return jsonify(hidden_clue=False)
+        return jsonify(hidden_clue=hidden[0])
 
 
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
-    # Temp hard coding
-    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
-                   p02=[["证据3", False], ["证据4", False]], p03=[])
+    clues = server.update_released()
+    return jsonify(p01=clues["p01"],
+                   p02=clues["p02"],
+                   p03=clues["p03"],
+                   p04=clues["p04"],
+                   p05=clues["p05"])
 
 
 @app.route("/release_clue/")
 def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
-    # is_release=True -> This clue has been released
-    # is_release=False -> This clue has not been released
-    is_release = server.verify_release(clue)
-    if is_release is False:
-        return jsonify(status="success")
-    else:
+    # place = str(request.args.get("name_place")).lower()
+    place = 'p01'  # temp hard coding
+    is_release = server.verify_release(clue, place)  # True: has been released
+    if is_release:
         return jsonify(status="failure")
+    else:
+        return jsonify(status="success")
 
 
 # Part IV: Vote
@@ -224,7 +229,6 @@ def final_result():
 
 
 if __name__ == "__main__":
-    # handler = logging.FileHandler('MMG_server.log', encoding='UTF-8')
-    # handler.setLevel(logging.INFO)
-    # app.logger.addHandler(handler)
+    logging.basicConfig(filename='MMG_server.log', level=logging.INFO,
+                        filemode='w')
     app.run(debug=True)
