@@ -171,7 +171,7 @@ def hidden_clue():
     clue = str(request.args.get("clue_for_hidden")).lower()
     n_round = db.track["round"]
     hidden = server.search_hidden_clue(name, clue, n_round)
-    if len(hidden) == 1:
+    if type(hidden) == str:
         return jsonify(hidden_clue=hidden)
     else:
         return jsonify(hidden_clue=hidden[0])
@@ -179,11 +179,7 @@ def hidden_clue():
 
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
-    print(db.track["publicized_clue"])
-    clues = {}
-    for x in db.game["locations"]:
-        clues[x] = server.update_released(x)
-    print(clues)
+    clues = server.update_released()
     return jsonify(p01=clues["p01"],
                    p02=clues["p02"],
                    p03=clues["p03"],
@@ -197,7 +193,6 @@ def release_clue():
     # place = str(request.args.get("name_place")).lower()
     place = 'p01'  # temp hard coding
     is_release = server.verify_release(clue, place)  # True: has been released
-    print("In gui.py release_clue: released {}".format(clue))
     if is_release:
         return jsonify(status="failure")
     else:

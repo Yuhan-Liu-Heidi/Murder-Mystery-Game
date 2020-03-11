@@ -181,9 +181,13 @@ def verify_release(clue, place):  # BUG: cant get place
     :param place: string containing the place of the clue
     :return: boolean representing if the clue has been revealed
     """
+    is_released = False
     for released_clue in db.track["publicized_clue"][place]:
         if clue in released_clue:
-            return True
+            is_released = True
+            break
+    if is_released:
+        return True
     else:
         db.track["publicized_clue"][place].append(clue)  # 给db
         return False
@@ -200,7 +204,6 @@ def search_hidden_clue(u_id, clue, n_rnd):
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
     place = ""
-    hidden = ""
     if u_ap <= 0:
         return False, error_messages[8]
     else:
@@ -209,46 +212,55 @@ def search_hidden_clue(u_id, clue, n_rnd):
         for p in db.game["clues"][rnd].keys():
             for c in db.game["clues"][rnd][p]:
                 if clue in c.split("//")[0]:
-                    hidden = c.split("//")[1]
                     place = p
                     has_found = True
                     break
             if has_found:
                 break
-        if hidden == "" or place == "":
+        if place == "":
             return False
         if u_ch in place:
             return False, error_messages[7]
         else:
-            if hidden in db.track["hidden"]:
-                db.track["hidden"].remove(hidden)  # 给db
-                db.user[u_id]["ap"] -= 2  # 给db
+            for c, h in db.track["hidden"].items():
+                if clue == c:
+                    hidden = db.track["hidden"][c]
+                    db.track["hidden"][c] = ""  # 给db
+                    db.user[u_id]["ap"] -= 2  # 给db
                 return hidden
             else:
                 return False, error_messages[10]
 
 
-def verify_hidden_for_release():
-    pass
-
-
-def update_released(place):
-    released_clues = []
+def update_released():
+    released_clues = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
     # hidden revealed: ["clue_0", "clue_1"]
     # hidden not revealed: ["clue_0"]
     # no hidden: ["clue_0", False]
-    for c in db.track["publicized_clue"][place]:
-        if type(c) == list:
-            continue
-        clue = c.split("//")
-        if len(clue) == 1:
-            released_clues.append([clue[0], False])
-        elif clue[1] == "searchable":
-            released_clues.append([clue[0]])
-        elif clue[1] == "unsearchable":
-            released_clues.append([clue[0], False])
-        else:
-            released_clues.append([clue[0], clue[1]])
+    n_rnd = db.track["round"]
+    if n_rnd == 0:
+        return released_clues
+    elif n_rnd == 1:
+        rnd = ["round1"]
+    else:
+        rnd = ["round1", "round2"]
+    for place in db.game["locations"]:
+        for r in rnd:
+            for c in db.game["clues"][r][place]:
+                clue = c.split("//")
+                if len(clue) == 1:
+                    if clue[0] in db.track["publicized_clue"][place]:
+                        released_clues[place].append([clue[0]])
+                else:
+                    c_0 = c.split("//")[0]
+                    c_1 = c.split("//")[1]
+                    if c_0 in db.track["publicized_clue"][place]:
+                        if c_1 in db.track["publicized_clue"][place]:
+                            released_clues[place].append([clue[0], clue[1]])
+                        else:
+                            released_clues[place].append([clue[0], False])
+                    else:
+                        continue
     return released_clues
 
 
