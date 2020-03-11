@@ -4,13 +4,10 @@ global user, game
 user = {}
 vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
 track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
-         'publicized_clue': {'p01': [],
-                             'p02': [],
-                             'p03': [],
-                             'p04': [],
+         'publicized_clue': {'p01': [], 'p02': [], 'p03': [], 'p04': [],
                              'p05': []},
          'clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []},
-         'hidden': [],
+         'hidden': {},
          'round': 0}
 
 

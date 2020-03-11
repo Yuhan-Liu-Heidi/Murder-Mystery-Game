@@ -108,7 +108,6 @@ def start_rnd(n_rnd, u_id):
             for place in db.game["locations"]:
                 for clue in db.game["clues"][rnd][place]:
                     db.track["clues"][place].append(clue)  # 给db
-                print(db.track["clues"])
             return True
 
 
@@ -140,7 +139,9 @@ def search_clue(u_id, place):
                 clue = db.track["clues"][place][0]
                 db.track["clues"][place].remove(clue)  # 给db
                 if len(clue.split("//")) > 1:
-                    db.track["hidden"].append(clue.split("//")[1])  # 给db
+                    key = clue.split("//")[0]
+                    value = clue.split("//")[1]
+                    db.track["hidden"][key] = value  # 给db
                 db.user[u_id]["ap"] -= 2  # 给db
                 return True, clue
             else:
@@ -162,9 +163,9 @@ def update_clue_num():
         for place in db.game["locations"]:
             num_clue[index][1] = len(db.game["clues"]["round1"][place])
             num_clue[index][2] = num_clue[index][1] + \
-                                 len(db.game["clues"]["round2"][place])
+                len(db.game["clues"]["round2"][place])
             num_clue[index][0] = num_clue[index][rnd] - \
-                                 len(db.track["clues"][place])
+                len(db.track["clues"][place])
             index += 1
         return jsonify(p01=[num_clue[0][0], num_clue[0][rnd]],
                        p02=[num_clue[1][0], num_clue[1][rnd]],
@@ -180,10 +181,11 @@ def verify_release(clue, place):  # BUG: cant get place
     :param place: string containing the place of the clue
     :return: boolean representing if the clue has been revealed
     """
-    if clue in str(db.track["publicized_clue"][place]):
-        return True
+    for released_clue in db.track["publicized_clue"][place]:
+        if clue in released_clue:
+            return True
     else:
-        db.track["publicized_clue"][place].append([clue])  # 给db
+        db.track["publicized_clue"][place].append(clue)  # 给db
         return False
 
 
@@ -203,14 +205,16 @@ def search_hidden_clue(u_id, clue, n_rnd):
         return False, error_messages[8]
     else:
         rnd = "round{}".format(n_rnd)
+        has_found = False
         for p in db.game["clues"][rnd].keys():
             for c in db.game["clues"][rnd][p]:
-                print("Want to search hidden for {}".format(clue))
-                print("Comparing w/ {}".format(c.split("//")[0]))
                 if clue in c.split("//")[0]:
                     hidden = c.split("//")[1]
                     place = p
+                    has_found = True
                     break
+            if has_found:
+                break
         if hidden == "" or place == "":
             return False
         if u_ch in place:
@@ -226,6 +230,26 @@ def search_hidden_clue(u_id, clue, n_rnd):
 
 def verify_hidden_for_release():
     pass
+
+
+def update_released(place):
+    released_clues = []
+    # hidden revealed: ["clue_0", "clue_1"]
+    # hidden not revealed: ["clue_0"]
+    # no hidden: ["clue_0", False]
+    for c in db.track["publicized_clue"][place]:
+        if type(c) == list:
+            continue
+        clue = c.split("//")
+        if len(clue) == 1:
+            released_clues.append([clue[0], False])
+        elif clue[1] == "searchable":
+            released_clues.append([clue[0]])
+        elif clue[1] == "unsearchable":
+            released_clues.append([clue[0], False])
+        else:
+            released_clues.append([clue[0], clue[1]])
+    return released_clues
 
 
 # Part IV: Vote
