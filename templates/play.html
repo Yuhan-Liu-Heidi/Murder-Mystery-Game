@@ -119,7 +119,7 @@ function hide() {
 
     <h3 id="C2">故事</h3>
     <input type="button" id="hideImage" value="展开故事" onclick="hide()">
-    <img id="myImage" src="{{ url_for("static", filename=msg_info["ch_name"]+".jpg") }}" alt="story" style="display:none;">
+    <img id="myImage" src="{{ url_for("static", filename=msg_info["ch_name"]+".jpg") }}" alt="story" style="display:none;", onclick="hide()">
     <hr>
 
 
@@ -132,7 +132,7 @@ function hide() {
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
-    $(document).ready(function(){
+    $(document).ready(function display(){
         $.get("/locations/", function(data){
             var i, num;
             var key_list = Object.keys(data);
@@ -393,6 +393,8 @@ function hide() {
     };
 
     window.onload = update_num();
+    window.onload = update_revealed_clues();
+    window.onload = expand_all();
 
     function update_num() {
         $(document).ready(function(){
