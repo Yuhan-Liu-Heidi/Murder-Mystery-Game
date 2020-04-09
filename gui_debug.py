@@ -90,12 +90,21 @@ def start_round1():
 def start_round2():
     name1 = request.args.get("name_ready_for_2")
     # Receive the names that are ready.
-    # OK! Everyone is ready for round 1?
+    # OK! Everyone is ready for round 2?
     check = "lily"
     if str(name1).lower() == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
+
+
+@app.route("/check_round_status/")
+def check_round_status():
+    name1 = request.args.get("name")
+    # Receive the names want to update the round status.
+    # check: round1=[该角色是否开始, 整体是否开始]
+    # round2=[该角色是否开始, 整体是否开始]
+    return jsonify(round1=[True, True], round2=[True, False])
 
 
 @app.route("/clue_num/")
@@ -134,6 +143,12 @@ def hidden_clue():
 
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
+    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
+                   p02=[["证据3", False], ["证据4", False]], p03=[])
+
+
+@app.route("/update_own_clues/")
+def update_own_clues():
     return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
                    p02=[["证据3", False], ["证据4", False]], p03=[])
 
