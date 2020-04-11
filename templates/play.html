@@ -462,14 +462,18 @@ function hide() {
         if (clue_bid.endsWith("bhc") || clue_bid.endsWith("bhcr")) {
             var hidden_clue_id = clue_bid.replace("bhc", "hc");
             var clue = $("#" + hidden_clue_id).text().trim();
+            var location_id = clue_bid.slice(0, 2);
+            var lo = $("#col" + location_id).text().trim();
         } else {
             var clue_id = clue_bid.replace("b", "c");
             var clue = $("#" + clue_id).text().trim().slice(4);
+            var location_id = clue_bid.slice(0, 2);
+            var lo = $("#col" + location_id).text().trim();
         }
         $.ajax({
             url: "/release_clue/",
             type: "get",
-            data: {clue_to_release: clue},
+            data: {clue_to_release: clue, location: lo},
             success: function (data) {
                 $("#"+clue_bid).text("已公开");
                 if (data.status == "failure") {
