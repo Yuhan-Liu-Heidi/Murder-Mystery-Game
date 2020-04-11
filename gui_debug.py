@@ -90,12 +90,21 @@ def start_round1():
 def start_round2():
     name1 = request.args.get("name_ready_for_2")
     # Receive the names that are ready.
-    # OK! Everyone is ready for round 1?
+    # OK! Everyone is ready for round 2?
     check = "lily"
     if str(name1).lower() == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
+
+
+@app.route("/check_round_status/")
+def check_round_status():
+    name1 = request.args.get("name")
+    # Receive the names want to update the round status.
+    # check: round1=[该角色是否开始, 整体是否开始]
+    # round2=[该角色是否开始, 整体是否开始]
+    return jsonify(round1=[True, True], round2=[True, False])
 
 
 @app.route("/clue_num/")
@@ -134,8 +143,29 @@ def hidden_clue():
 
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
-    return jsonify(p01=[["证据1", "深入证据1"], ["证据2"]],
-                   p02=[["证据3", False], ["证据4", False]], p03=[])
+    # 地点=[] (这个地点暂时没公开证据)
+    # 地点=[[第一个证据(无深入),[(空)]],...]
+    # 地点=[[第一个证据,[深入证据]],...]
+    # 地点=[[第一个证据,[False(指没公开)，深入了?]],...]
+    return jsonify(p01=[["证据1", ["深入证据1"]], ["证据2", []]],
+                   p02=[["证据3", [False, False]]],
+                   p03=[["证据4", [False, True]]],
+                   p04=[["证据9", [False, False]]],
+                   p05=[])
+
+
+@app.route("/update_own_clues/")
+def update_own_clues():
+    # 地点=[] (这个地点暂时没搜到证据)
+    # 地点=[[[第一个证据(无深入), 公开了？],[(空)]],...]
+    # 地点=[[[第一个证据, 公开了?],[深入证据, 公开了?]],...]
+    # 地点=[[[第一个证据, 公开了?],[False(没深入)]],...]
+    return jsonify(p01=[[["证据1", False], ["深入证据1", False]],
+                        [["证据2", True], []]],
+                   p02=[[["证据3", True], [False]], [["证据4", False], []]],
+                   p03=[[["证据5", True], ["深入证据5", True]]],
+                   p04=[[["证据6", True], [False]]],
+                   p05=[])
 
 
 @app.route("/release_clue/")
