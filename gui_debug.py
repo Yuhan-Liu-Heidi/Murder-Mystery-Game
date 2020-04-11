@@ -124,6 +124,10 @@ def find_clue():
     place = str(request.args.get("name_place")).lower()
     # somehow get the clue in someplace for someone
     # update numbers in place
+    # 1. 不能搜自己 clue="error", hidden=False
+    # 2. AP不足 clue="no ap", hidden=False
+    # 3. 线索搜完 clue="no clue", hidden=False
+    # 4. 正常情况 clue="线索1", hidden=True/False
     return jsonify(clue="线索1", hidden=True)
 
 
