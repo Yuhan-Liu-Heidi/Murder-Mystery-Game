@@ -6,16 +6,16 @@ import database as db
 app = Flask(__name__)
 
 
-error_messages = {0: "该用户不存在",
-                  1: "该用户已存在",
+error_messages = {0: "该用户已存在",
+                  1: "该用户不存在",
                   2: "密码不正确",
-                  3: "本轮搜证未开始",
-                  5: "这不是您的角色，请不要作弊哦~",
-                  6: "该角色不存在",
-                  7: "error",
-                  8: "no ap",
-                  9: "no clue",
-                  10: "该线索已被深入"}
+                  3: "这不是您的角色，请不要作弊哦~",
+                  4: "该角色不存在",
+                  5: "本轮搜证未开始",
+                  6: "error",
+                  7: "no ap",
+                  8: "no clue",
+                  9: "该线索已被深入"}
 
 
 # Part I: User sign-up and log-in
@@ -43,7 +43,7 @@ def verify_user(i, p):
     try:
         u_id = [x for x in db.user.keys() if x == i][0]
     except IndexError:
-        return error_messages[0]
+        return error_messages[1]
     try:
         assert p == db.user[u_id]["pw"]
     except AssertionError:
@@ -101,13 +101,13 @@ def start_rnd(n_rnd, u_id):
         if n_start < db.game["player_num"]:
             return False
         else:
-            db.track["round"] = n_rnd  # 给db
+            db.track["round"] = n_rnd  # 给db：记录游戏轮数
             rnd = "round{}".format(n_rnd)
-            for user in db.user:  # 加ap 给db
+            for user in db.user:  # 给db：玩家AP增加
                 db.user[user]["ap"] += db.game['round_ap'] * 2
             for place in db.game["locations"]:
                 for clue in db.game["clues"][rnd][place]:
-                    db.track["clues"][place].append(clue)  # 给db
+                    db.track["clues"][place].append(clue)  # 给db：更新可搜线索池
             return True
 
 
@@ -126,26 +126,28 @@ def search_clue(u_id, place):
     """
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
-    if u_ch in place:
-        return False, error_messages[7]
+    r_num = db.track["round"]
+    if r_num == 0:
+        return False, error_messages[5]
+    elif u_ch in place:
+        return False, error_messages[6]
     elif u_ap <= 0:
-        return False, error_messages[8]
+        return False, error_messages[7]
     else:
-        r_num = db.track["round"]
-        if r_num == 0:
-            return False, error_messages[3]
-        else:
-            if len(db.track["clues"][place]) is not 0:
-                clue = db.track["clues"][place][0]
-                db.track["clues"][place].remove(clue)  # 给db
-                if len(clue.split("//")) > 1:
-                    key = clue.split("//")[0]
-                    value = clue.split("//")[1]
-                    db.track["hidden"][key] = value  # 给db
-                db.user[u_id]["ap"] -= 2  # 给db
-                return True, clue
+        if len(db.track["clues"][place]) is not 0:
+            clue = db.track["clues"][place][0]
+            db.track["clues"][place].remove(clue)  # 给db：去掉已搜证据
+            if len(clue.split("//")) > 1:
+                clue_1, _ = clue.split('//')
+                clue_save = clue.replace(clue_1, clue_1+'/'+u_id)
+                db.track['searched_clues'][place].append(clue_save)
+                # 给db：记录证据归属
             else:
-                return False, error_messages[9]
+                db.track['searched_clues'][place].append(clue+'/'+u_id)
+                # 给db：记录证据归属
+            return True, clue
+        else:
+            return False, error_messages[8]
 
 
 def update_clue_num():
@@ -174,94 +176,106 @@ def update_clue_num():
                        p05=[num_clue[4][0], num_clue[4][rnd]])
 
 
-def verify_release(clue, place):  # BUG: cant get place
+def verify_release(clue, place):
     """ Verify if a clue has been revealed
 
     :param clue: string containing the clue
     :param place: string containing the place of the clue
     :return: boolean representing if the clue has been revealed
     """
-    is_released = False
-    for released_clue in db.track["publicized_clue"][place]:
-        if clue in released_clue:
-            is_released = True
-            break
-    if is_released:
-        return True
-    else:
-        db.track["publicized_clue"][place].append(clue)  # 给db
-        return False
+    def has_publicized(c):
+        c_splt = c.split('/')
+        if c_splt[1] == 'publicized':
+            return True
+        else:
+            return False
+    for srchd_c in db.track['searched_clues'][place]:
+        if clue in srchd_c:
+            srchd_splt = srchd_c.split('//')
+            has_hidden = bool(len(srchd_splt)-1)
+            if has_hidden:
+                if clue in srchd_splt[0]:
+                    result = has_publicized(srchd_splt[0])
+                    c_save = srchd_splt[0].split('/')[0] + '/publicized//'\
+                        + srchd_splt[1]
+                else:
+                    result = has_publicized(srchd_splt[1])
+                    c_save = srchd_splt[0].split('/')[0] + '/publicized//'\
+                        + srchd_splt[1].split('/')[0] + '/publicized//'
+            else:
+                result = has_publicized(srchd_splt[0])
+                c_save = srchd_c + '/publicized'
+            db.track['searched_clues'][place].remove(srchd_c)  # 给db：更新公开
+            db.track['searched_clues'][place].append(c_save)
+            return result
 
 
-def search_hidden_clue(u_id, clue, n_rnd):
+def search_hidden_clue(u_id, clue):
     """
 
     :param u_id:
     :param clue:
-    :param n_rnd:
     :return:
     """
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
     place = ""
     if u_ap <= 0:
-        return False, error_messages[8]
+        return False, error_messages[7]
     else:
-        rnd = "round{}".format(n_rnd)
         has_found = False
-        for p in db.game["clues"][rnd].keys():
-            for c in db.game["clues"][rnd][p]:
-                if clue in c.split("//")[0]:
+        for p in db.track['searched_clues'].keys():
+            for c in db.track['searched_clues'][p]:
+                if clue in c.split("//")[0].split('/')[0]:
                     place = p
                     has_found = True
+                    c_full = c
                     break
             if has_found:
                 break
-        if place == "":
-            return False
+        if not has_found:
+            return False, 'No such clue found'
         if u_ch in place:
-            return False, error_messages[7]
+            return False, error_messages[6]
         else:
-            for c, h in db.track["hidden"].items():
-                if clue == c:
-                    hidden = db.track["hidden"][c]
-                    db.track["hidden"][c] = ""  # 给db
-                    db.user[u_id]["ap"] -= 2  # 给db
-                return hidden
+            hidden = c_full.split('//')[1]
+            if len(hidden.split('/')) == 1:
+                c_save = c_full + '/' + u_id
+                db.track['searched_clues'][place].remove(c_full)  # 给db
+                db.track['searched_clues'][place].append(c_save)  # 给db
+                db.user[u_id]["ap"] -= 2  # 给db
+                return True, hidden
             else:
-                return False, error_messages[10]
+                return False, error_messages[9]
 
 
 def update_released():
-    released_clues = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
-    # hidden revealed: ["clue_0", "clue_1"]
-    # hidden not revealed: ["clue_0"]
-    # no hidden: ["clue_0", False]
+    rlsd_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
+    # clue w/o hidden: ["clue_0", []]
+    # clue w/ hidden: ["clue_0", ["clue_1"]] if "clue_1" revealed
+    #                 ["clue_0", [False, is_searched]]
     n_rnd = db.track["round"]
     if n_rnd == 0:
-        return released_clues
-    elif n_rnd == 1:
-        rnd = ["round1"]
-    else:
-        rnd = ["round1", "round2"]
-    for place in db.game["locations"]:
-        for r in rnd:
-            for c in db.game["clues"][r][place]:
-                clue = c.split("//")
-                if len(clue) == 1:
-                    if clue[0] in db.track["publicized_clue"][place]:
-                        released_clues[place].append([clue[0]])
-                else:
-                    c_0 = c.split("//")[0]
-                    c_1 = c.split("//")[1]
-                    if c_0 in db.track["publicized_clue"][place]:
-                        if c_1 in db.track["publicized_clue"][place]:
-                            released_clues[place].append([clue[0], clue[1]])
-                        else:
-                            released_clues[place].append([clue[0], False])
+        return rlsd_c
+    for place in db.track['searched_clues'].keys():
+        for clue in db.track['searched_clues'][place]:
+            c = clue.split("//")
+            if len(c) == 1:
+                if c[0].split('/')[1] == 'publicized':
+                    rlsd_c[place].append([c[0].split('/')[0], []])
+            else:
+                if c[0].split('/')[1] == 'publicized':
+                    if len(c[1].split('/')) == 1:
+                        c_pub = c[0].split('/')[0]
+                        rlsd_c[place].append([c_pub, [False, False]])
                     else:
-                        continue
-    return released_clues
+                        if c[1].split('/')[1] == 'publicized':
+                            c_pub = [c[0].split('/')[0], c[1].split('/')[0]]
+                            rlsd_c[place].append([c_pub[0], [c_pub[1]]])
+                        else:
+                            c_pub = c[0].split('/')[0]
+                            rlsd_c[place].append([c_pub, [False, True]])
+    return rlsd_c
 
 
 # Part IV: Vote

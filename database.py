@@ -1,11 +1,21 @@
-# assume ap is the same for round1 and round2
+# assuming ap is the same for round1 and round2
+"""
+Clue storing:
+ - All clues come in the format of 'clue' or 'clue//clue_hidden'
+ - After a user searched a clue, save 'clue/userID' or
+   'clue/userID//clue_hidden' to track['searched_clues']
+ - After a user publicized a clue, change 'clue/userID' part
+   to 'clue/pubilicized'
+"""
+
+
 import json
 global user, game
 user = {}
 vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
 track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
-         'publicized_clue': {'p01': [], 'p02': [], 'p03': [], 'p04': [],
-                             'p05': []},
+         'searched_clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [],
+                            'p05': []},
          'clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []},
          'hidden': {},
          'round': 0}

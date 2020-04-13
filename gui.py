@@ -25,7 +25,7 @@ def login():
             u_pw = request.form["psw"]
             signed_up = server.new_user(u_id, u_pw)
             if not signed_up:
-                error_msg = server.error_messages[1]
+                error_msg = server.error_messages[0]
             else:
                 message = "You've signed up"
                 app.logger.info("User created: {}".format(u_id))
@@ -98,13 +98,13 @@ def play(u_name, ch_name):
             return render_template("play.html", msg_info=message)
         else:
             if ch_name in db.game['chars']:
-                return server.error_messages[5]
+                return server.error_messages[3]
             else:
-                return server.error_messages[6]
+                return server.error_messages[4]
     else:
         vote_name = request.form["vote"]
-        db.vote[vote_name].append(ch_name)  # 给db
-        db.user[u_name]["round"]["voted"] = True  # 给db
+        db.vote[vote_name].append(ch_name)  # 给db：记录投票结果
+        db.user[u_name]["round"]["voted"] = True  # 给db：记录已投用户
         app.logger.info("User {} voted {}".format(u_name, vote_name))
         return redirect(url_for("ending"))
 
@@ -153,13 +153,10 @@ def start_round2():
 def find_clue():
     name = str(request.args.get("name_find_clue")).lower()
     place = str(request.args.get("name_place")).lower()
-    [result, clue] = server.search_clue(name, place)
+    result, clue = server.search_clue(name, place)
     if result:
         clue_release = clue.split('//')
-        if len(clue_release) == 1:
-            has_hidden = False
-        else:
-            has_hidden = True
+        has_hidden = bool(len(clue_release)-1)
         return jsonify(clue=clue_release[0], hidden=has_hidden)
     else:
         return jsonify(clue=clue, hidden=False)
@@ -169,12 +166,11 @@ def find_clue():
 def hidden_clue():
     name = str(request.args.get("name_find_clue")).lower()
     clue = str(request.args.get("clue_for_hidden")).lower()
-    n_round = db.track["round"]
-    hidden = server.search_hidden_clue(name, clue, n_round)
-    if type(hidden) == str:
+    result, hidden = server.search_hidden_clue(name, clue)
+    if result:
         return jsonify(hidden_clue=hidden)
     else:
-        return jsonify(hidden_clue=hidden[0])
+        return jsonify(hidden_clue=result)
 
 
 @app.route("/update_revealed_clues/")
