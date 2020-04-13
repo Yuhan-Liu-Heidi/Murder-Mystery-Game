@@ -162,7 +162,7 @@ def find_clue():
             has_hidden = True
         return jsonify(clue=clue_release[0], hidden=has_hidden)
     else:
-        return
+        return jsonify(clue=clue, hidden=False)
 
 
 @app.route("/hidden_clue/")
