@@ -342,51 +342,59 @@ function hide() {
                 type: "get",
                 data: {name_find_clue: user_name, clue_for_hidden: clue},
                 success: function (data) {
-                    if (data.hidden_clue!=false) {
-                        if ($("#own_clues li:contains("+clue+")").attr("id")!=undefined) {
-                            var clue_id = $("#own_clues li:contains("+clue+")").attr("id");
-                            var hidden_button_id = clue_id.replace("c", "bh");
-                            var hidden_clue_id = clue_id.replace("c", "hc");
-                            var hidden_release_button_id = clue_id.replace("c", "bhc");
-                            $("#" + hidden_button_id).text("已深入");
-                            $("#" + hidden_button_id).after($('<p />', {
-                                id: hidden_clue_id, text: data.hidden_clue,
-                                style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-left:2pc"
-                            }));
-                            $("#" + hidden_clue_id).after($('<button />', {
-                                id: hidden_release_button_id, text: "公开线索",
-                                onclick: "if (confirm('Are you sure?')) { release_clue(); } else { return false; }"}));
-                            $("#" + hidden_release_button_id).after("<br>");
-                        } else {
-                            var p_index = "#clues_in_p"+index;
-                            var clue_index = ($(p_index+" li").length+1).toString();
-                            if (clue_index.length<2) {
-                                clue_index = "0"+clue_index
-                            }
-                            var clue_id = index+"p"+clue_index+"c";
-                            var hidden_clue_id = clue_id.replace("c", "hc");
-                            var hidden_release_button_id = clue_id.replace("c", "bhc");
-                            $(p_index).append($('<li />', {
-                                id: clue_id, text: $(p_index+" li").length+1+". "+clue,
-                                style: "display:inline-block;margin-top:10px"}));
-                            $("#" + clue_id).after($('<p />', {
-                                id: hidden_clue_id, text: data.hidden_clue,
-                                style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-left:2pc"}));
-                            $("#" + hidden_clue_id).before("<br>");
-                            $("#" + hidden_clue_id).after($('<button />', {
-                                id: hidden_release_button_id, text: "公开线索",
-                                onclick: "if (confirm('Are you sure?')) { release_clue(); } else { return false; }"}));
-                            $("#" + hidden_release_button_id).after("<br>");
-                        }
-                        $("#" + clue_bid).text("已深入");
-                        x.classList.toggle("active");
-                        var content = x.nextElementSibling;
-                        content.style.maxHeight = content.scrollHeight + "px";
+                    if (data.hidden_clue == "error") {
+                        alert("不可搜证自己的证据！");
+                    } else if (data.hidden_clue == "no ap") {
+                        alert("AP不足！");
+                    } else if (data.hidden_clue == "no clue") {
+                        alert("已无更多证据！");
                     } else {
-                        alert("该线索已被深入");
-                        $("#" + clue_bid).text("已深入");
+                        if (data.hidden_clue!=false) {
+                            if ($("#own_clues li:contains("+clue+")").attr("id")!=undefined) {
+                                var clue_id = $("#own_clues li:contains("+clue+")").attr("id");
+                                var hidden_button_id = clue_id.replace("c", "bh");
+                                var hidden_clue_id = clue_id.replace("c", "hc");
+                                var hidden_release_button_id = clue_id.replace("c", "bhc");
+                                $("#" + hidden_button_id).text("已深入");
+                                $("#" + hidden_button_id).after($('<p />', {
+                                    id: hidden_clue_id, text: data.hidden_clue,
+                                    style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-left:2pc"
+                                }));
+                                $("#" + hidden_clue_id).after($('<button />', {
+                                    id: hidden_release_button_id, text: "公开线索",
+                                    onclick: "if (confirm('Are you sure?')) { release_clue(); } else { return false; }"}));
+                                $("#" + hidden_release_button_id).after("<br>");
+                            } else {
+                                var p_index = "#clues_in_p"+index;
+                                var clue_index = ($(p_index+" li").length+1).toString();
+                                if (clue_index.length<2) {
+                                    clue_index = "0"+clue_index
+                                }
+                                var clue_id = index+"p"+clue_index+"c";
+                                var hidden_clue_id = clue_id.replace("c", "hc");
+                                var hidden_release_button_id = clue_id.replace("c", "bhc");
+                                $(p_index).append($('<li />', {
+                                    id: clue_id, text: $(p_index+" li").length+1+". "+clue,
+                                    style: "display:inline-block;margin-top:10px"}));
+                                $("#" + clue_id).after($('<p />', {
+                                    id: hidden_clue_id, text: data.hidden_clue,
+                                    style: "display:inline-block;margin-right:20px;margin-bottom:10px;margin-left:2pc"}));
+                                $("#" + hidden_clue_id).before("<br>");
+                                $("#" + hidden_clue_id).after($('<button />', {
+                                    id: hidden_release_button_id, text: "公开线索",
+                                    onclick: "if (confirm('Are you sure?')) { release_clue(); } else { return false; }"}));
+                                $("#" + hidden_release_button_id).after("<br>");
+                            }
+                            $("#" + clue_bid).text("已深入");
+                            x.classList.toggle("active");
+                            var content = x.nextElementSibling;
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        } else {
+                            alert("该线索已被深入");
+                            $("#" + clue_bid).text("已深入");
+                        }
+                        update_num();
                     }
-                    update_num();
                 },
             });
         } else {
