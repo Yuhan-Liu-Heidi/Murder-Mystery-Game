@@ -153,13 +153,8 @@ def start_round2():
 def find_clue():
     name = str(request.args.get("name_find_clue")).lower()
     place = str(request.args.get("name_place")).lower()
-    result, clue = server.search_clue(name, place)
-    if result:
-        clue_release = clue.split('//')
-        has_hidden = bool(len(clue_release)-1)
-        return jsonify(clue=clue_release[0], hidden=has_hidden)
-    else:
-        return jsonify(clue=clue, hidden=False)
+    clue, has_hidden = server.search_clue(name, place)
+    return jsonify(clue=clue, hidden=has_hidden)
 
 
 @app.route("/hidden_clue/")
@@ -183,11 +178,22 @@ def update_revealed_clues():
                    p05=clues["p05"])
 
 
+@app.route("/update_own_clues/")
+def update_own_clues():
+    u_id = str(request.args.get("id")).lower()
+    clues = server.update_own(u_id)
+    return jsonify(p01=clues["p01"],
+                   p02=clues["p02"],
+                   p03=clues["p03"],
+                   p04=clues["p04"],
+                   p05=clues["p05"])
+
+
 @app.route("/release_clue/")
 def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
-    # place = str(request.args.get("name_place")).lower()
-    place = 'p01'  # temp hard coding
+    place = str(request.args.get("location")).lower()
+    print("in release_clue: \nclue={}\nplace={}".format(clue, place))
     is_release = server.verify_release(clue, place)  # True: has been released
     if is_release:
         return jsonify(status="failure")

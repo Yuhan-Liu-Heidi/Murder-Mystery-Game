@@ -395,8 +395,10 @@ function hide() {
     }
 
     function update_own_clues() {
+        var user_name = $("#u_name").text().trim()
         $.ajax({
             url: "/update_own_clues/",
+            data: {id: user_name},
             type: "get",
             success: function (data) {
                 var num = Object.keys(data).length;
@@ -470,18 +472,16 @@ function hide() {
         if (clue_bid.endsWith("bhc") || clue_bid.endsWith("bhcr")) {
             var hidden_clue_id = clue_bid.replace("bhc", "hc");
             var clue = $("#" + hidden_clue_id).text().trim();
-            var location_id = clue_bid.slice(0, 2);
-            var lo = $("#col" + location_id).text().trim();
+            var location_id = "p"+clue_bid.slice(0, 2);
         } else {
             var clue_id = clue_bid.replace("b", "c");
             var clue = $("#" + clue_id).text().trim().slice(4);
-            var location_id = clue_bid.slice(0, 2);
-            var lo = $("#col" + location_id).text().trim();
+            var location_id = "p"+clue_bid.slice(0, 2);
         }
         $.ajax({
             url: "/release_clue/",
             type: "get",
-            data: {clue_to_release: clue, location: lo},
+            data: {clue_to_release: clue, location: location_id},
             success: function (data) {
                 $("#"+clue_bid).text("已公开");
                 if (data.status == "failure") {

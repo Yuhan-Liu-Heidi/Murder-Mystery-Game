@@ -127,27 +127,30 @@ def search_clue(u_id, place):
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
     r_num = db.track["round"]
+    has_hidden = False
     if r_num == 0:
-        return False, error_messages[5]
+        clue = error_messages[5]
     elif u_ch in place:
-        return False, error_messages[6]
+        clue = error_messages[6]
     elif u_ap <= 0:
-        return False, error_messages[7]
+        clue = error_messages[7]
     else:
-        if len(db.track["clues"][place]) is not 0:
-            clue = db.track["clues"][place][0]
-            db.track["clues"][place].remove(clue)  # 给db：去掉已搜证据
-            if len(clue.split("//")) > 1:
-                clue_1, _ = clue.split('//')
-                clue_save = clue.replace(clue_1, clue_1+'/'+u_id)
+        if len(db.track["clues"][place]) == 0:
+            clue = error_messages[8]
+        else:
+            c = db.track["clues"][place][0]
+            db.track["clues"][place].remove(c)  # 给db：去掉已搜证据
+            if len(c.split("//")) > 1:
+                has_hidden = True
+                clue, _ = c.split('//')
+                clue_save = c.replace(clue, clue+'->'+u_id)
                 db.track['searched_clues'][place].append(clue_save)
                 # 给db：记录证据归属
             else:
-                db.track['searched_clues'][place].append(clue+'/'+u_id)
+                db.track['searched_clues'][place].append(c+'->'+u_id)
                 # 给db：记录证据归属
-            return True, clue
-        else:
-            return False, error_messages[8]
+                clue = c
+    return clue, has_hidden
 
 
 def update_clue_num():
@@ -184,7 +187,7 @@ def verify_release(clue, place):
     :return: boolean representing if the clue has been revealed
     """
     def has_publicized(c):
-        c_splt = c.split('/')
+        c_splt = c.split('->')
         if c_splt[1] == 'publicized':
             return True
         else:
@@ -196,15 +199,15 @@ def verify_release(clue, place):
             if has_hidden:
                 if clue in srchd_splt[0]:
                     result = has_publicized(srchd_splt[0])
-                    c_save = srchd_splt[0].split('/')[0] + '/publicized//'\
+                    c_save = srchd_splt[0].split('->')[0] + '->publicized//'\
                         + srchd_splt[1]
                 else:
                     result = has_publicized(srchd_splt[1])
-                    c_save = srchd_splt[0].split('/')[0] + '/publicized//'\
-                        + srchd_splt[1].split('/')[0] + '/publicized//'
+                    c_save = srchd_splt[0].split('->')[0] + '->publicized//'\
+                        + srchd_splt[1].split('->')[0] + '->publicized//'
             else:
                 result = has_publicized(srchd_splt[0])
-                c_save = srchd_c + '/publicized'
+                c_save = srchd_c.split('->')[0] + '->publicized//'
             db.track['searched_clues'][place].remove(srchd_c)  # 给db：更新公开
             db.track['searched_clues'][place].append(c_save)
             return result
@@ -226,7 +229,7 @@ def search_hidden_clue(u_id, clue):
         has_found = False
         for p in db.track['searched_clues'].keys():
             for c in db.track['searched_clues'][p]:
-                if clue in c.split("//")[0].split('/')[0]:
+                if clue in c.split("//")[0].split('->')[0]:
                     place = p
                     has_found = True
                     c_full = c
@@ -239,8 +242,8 @@ def search_hidden_clue(u_id, clue):
             return False, error_messages[6]
         else:
             hidden = c_full.split('//')[1]
-            if len(hidden.split('/')) == 1:
-                c_save = c_full + '/' + u_id
+            if len(hidden.split('->')) == 1:
+                c_save = c_full + '->' + u_id
                 db.track['searched_clues'][place].remove(c_full)  # 给db
                 db.track['searched_clues'][place].append(c_save)  # 给db
                 db.user[u_id]["ap"] -= 2  # 给db
@@ -260,22 +263,48 @@ def update_released():
     for place in db.track['searched_clues'].keys():
         for clue in db.track['searched_clues'][place]:
             c = clue.split("//")
-            if len(c) == 1:
-                if c[0].split('/')[1] == 'publicized':
-                    rlsd_c[place].append([c[0].split('/')[0], []])
+            if len(c) == 1 or c[1] == '':
+                if c[0].split('->')[1] == 'publicized':
+                    rlsd_c[place].append([c[0].split('->')[0], []])
             else:
-                if c[0].split('/')[1] == 'publicized':
-                    if len(c[1].split('/')) == 1:
-                        c_pub = c[0].split('/')[0]
+                if c[0].split('->')[1] == 'publicized':
+                    if len(c[1].split('->')) == 1:
+                        c_pub = c[0].split('->')[0]
                         rlsd_c[place].append([c_pub, [False, False]])
                     else:
-                        if c[1].split('/')[1] == 'publicized':
-                            c_pub = [c[0].split('/')[0], c[1].split('/')[0]]
+                        if c[1].split('->')[1] == 'publicized':
+                            c_pub = [c[0].split('->')[0], c[1].split('->')[0]]
                             rlsd_c[place].append([c_pub[0], [c_pub[1]]])
                         else:
-                            c_pub = c[0].split('/')[0]
+                            c_pub = c[0].split('->')[0]
                             rlsd_c[place].append([c_pub, [False, True]])
     return rlsd_c
+
+
+def update_own(u_id):
+    own_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
+    # clue w/o hidden: [["clue_0", False], []]
+    # clue w/ hidden: [["clue_0", False], [False]] "clue_1" not searched
+    #                 [["clue_0", False], ["clue_1", False]] "clue_1" searched
+    n_rnd = db.track["round"]
+    if n_rnd == 0:
+        return own_c
+    for place in db.track['searched_clues'].keys():
+        for clue in db.track['searched_clues'][place]:
+            owner = clue.split('->')[-1]
+            if u_id in owner:
+                c = clue.split('//')
+                if len(c) == 1 or c[1] == '':
+                    own_c[place].append([[c[0].split('->')[0], False], []])
+                else:
+                    if u_id in c[1]:
+                        c_pub_0 = [c[0].split('->')[0], False]
+                        c_pub_1 = [c[1].split('->')[0], False]
+                        own_c[place].append([c_pub_0, c_pub_1])
+                    else:
+                        c_pub_0 = [c[0].split('->')[0], False]
+                        own_c[place].append([c_pub_0, [False]])
+    return own_c
 
 
 # Part IV: Vote

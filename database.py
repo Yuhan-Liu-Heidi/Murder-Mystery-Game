@@ -5,7 +5,8 @@ Clue storing:
  - After a user searched a clue, save 'clue/userID' or
    'clue/userID//clue_hidden' to track['searched_clues']
  - After a user publicized a clue, change 'clue/userID' part
-   to 'clue/pubilicized'
+   to 'clue/publicized'
+ - In game json, if a clue does not have hidden, don't put 'clue//'
 """
 
 
