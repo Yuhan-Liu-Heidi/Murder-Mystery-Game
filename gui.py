@@ -193,12 +193,8 @@ def update_own_clues():
 def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
     place = str(request.args.get("location")).lower()
-    print("in release_clue: \nclue={}\nplace={}".format(clue, place))
-    is_release = server.verify_release(clue, place)  # True: has been released
-    if is_release:
-        return jsonify(status="failure")
-    else:
-        return jsonify(status="success")
+    status = server.verify_release(clue, place)  # True: has been released
+    return jsonify(status=status)
 
 
 # Part IV: Vote

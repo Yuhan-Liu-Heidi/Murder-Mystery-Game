@@ -127,10 +127,11 @@ def search_clue(u_id, place):
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
     r_num = db.track["round"]
+    place_name = db.game['location map'][place]
     has_hidden = False
     if r_num == 0:
         clue = error_messages[5]
-    elif u_ch in place:
+    elif u_ch in place_name:
         clue = error_messages[6]
     elif u_ap <= 0:
         clue = error_messages[7]
@@ -189,9 +190,9 @@ def verify_release(clue, place):
     def has_publicized(c):
         c_splt = c.split('->')
         if c_splt[1] == 'publicized':
-            return True
+            return "failure"
         else:
-            return False
+            return "success"
     for srchd_c in db.track['searched_clues'][place]:
         if clue in srchd_c:
             srchd_splt = srchd_c.split('//')
@@ -238,7 +239,8 @@ def search_hidden_clue(u_id, clue):
                 break
         if not has_found:
             return False, 'No such clue found'
-        if u_ch in place:
+        place_name = db.game['location map'][place]
+        if u_ch in place_name:
             return False, error_messages[6]
         else:
             hidden = c_full.split('//')[1]

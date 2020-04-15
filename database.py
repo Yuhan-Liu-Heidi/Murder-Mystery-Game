@@ -12,13 +12,13 @@ Clue storing:
 
 import json
 global user, game
+# Please initiate the following dict at the beginning
 user = {}
 vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
 track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
          'searched_clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [],
                             'p05': []},
          'clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []},
-         'hidden': {},
          'round': 0}
 
 
@@ -33,6 +33,8 @@ def rd_game():
 
 game = rd_game()
 game["murderer"] = "良小花"
+game["location map"] = {"p01": '良小花', "p02": '良星星', "p03": '米亚伦',
+                        "p04": '公共区域', "p05": '现场'}
 
 
 def create_user(user_id, pw):
