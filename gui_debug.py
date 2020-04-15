@@ -138,9 +138,13 @@ def hidden_clue():
     # somehow get the hidden clue as "深入线索1"
     # is_hidden=True -> This hidden clue is still hidden
     # is_hidden=False -> This hidden clue has been token
+    # 1. 不能搜自己 clue="error"
+    # 2. AP不足 clue="no ap"
+    # 3. 线索搜完 clue="no clue"
+    # 4. 正常情况 clue="线索1"
     is_hidden = True
     if is_hidden is True:
-        return jsonify(hidden_clue="深入线索1")
+        return jsonify(hidden_clue="线索1")
     else:
         return jsonify(hidden_clue=False)
 
@@ -175,6 +179,7 @@ def update_own_clues():
 @app.route("/release_clue/")
 def release_clue():
     clue = str(request.args.get("clue_to_release")).lower()
+    location = str(request.args.get("location")).lower()
     # is_release=True -> This clue has been released
     # is_release=False -> This clue has not been released
     is_release = True
