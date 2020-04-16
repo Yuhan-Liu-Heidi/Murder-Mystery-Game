@@ -132,10 +132,7 @@ def start_round1():
     name1 = request.args.get("name_ready_for_1")
     u_id = str(name1).lower()
     check = server.start_rnd(1, u_id)
-    if check:
-        return jsonify(result="1")
-    else:
-        return jsonify(result="0")
+    return jsonify(result=check)
 
 
 @app.route("/start_round2/")
@@ -143,10 +140,7 @@ def start_round2():
     name1 = request.args.get("name_ready_for_2")
     u_id = str(name1).lower()
     check = server.start_rnd(2, u_id)
-    if check:
-        return jsonify(result="1")
-    else:
-        return jsonify(result="0")
+    return jsonify(result=check)
 
 
 @app.route("/find_clue/")
@@ -161,11 +155,8 @@ def find_clue():
 def hidden_clue():
     name = str(request.args.get("name_find_clue")).lower()
     clue = str(request.args.get("clue_for_hidden")).lower()
-    result, hidden = server.search_hidden_clue(name, clue)
-    if result:
-        return jsonify(hidden_clue=hidden)
-    else:
-        return jsonify(hidden_clue=result)
+    hidden = server.search_hidden_clue(name, clue)
+    return jsonify(hidden_clue=hidden)
 
 
 @app.route("/update_revealed_clues/")

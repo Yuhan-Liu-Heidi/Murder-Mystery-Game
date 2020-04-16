@@ -95,11 +95,11 @@ def start_rnd(n_rnd, u_id):
     """
     db.track_round(u_id, n_rnd)  # set user True for this round
     if db.track["round"] >= n_rnd:
-        return True
+        return '1'
     else:
         n_start = sum([db.user[x]["round"][n_rnd] for x in db.user])
         if n_start < db.game["player_num"]:
-            return False
+            return '0'
         else:
             db.track["round"] = n_rnd  # 给db：记录游戏轮数
             rnd = "round{}".format(n_rnd)
@@ -108,7 +108,7 @@ def start_rnd(n_rnd, u_id):
             for place in db.game["locations"]:
                 for clue in db.game["clues"][rnd][place]:
                     db.track["clues"][place].append(clue)  # 给db：更新可搜线索池
-            return True
+            return '1'
 
 
 def search_clue(u_id, place):
@@ -237,11 +237,9 @@ def search_hidden_clue(u_id, clue):
                     break
             if has_found:
                 break
-        if not has_found:
-            return False, 'No such clue found'
         place_name = db.game['location map'][place]
         if u_ch in place_name:
-            return False, error_messages[6]
+            return error_messages[6]
         else:
             hidden = c_full.split('//')[1]
             if len(hidden.split('->')) == 1:
@@ -249,9 +247,9 @@ def search_hidden_clue(u_id, clue):
                 db.track['searched_clues'][place].remove(c_full)  # 给db
                 db.track['searched_clues'][place].append(c_save)  # 给db
                 db.user[u_id]["ap"] -= 2  # 给db
-                return True, hidden
+                return hidden
             else:
-                return False, error_messages[9]
+                return error_messages[9]
 
 
 def update_released():
