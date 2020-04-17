@@ -253,6 +253,7 @@ function hide() {
                     y.className= "btn-off";
                 } else if(data["round1"][0]==true && data["round1"][1]==true
                     && data["round2"][0]==true && data["round2"][1]==false) {
+                    $("button").removeClass("btn-off");
                     x.style.background = "white";
                     x.style.color = "black";
                     y.style.background = "white";
@@ -261,6 +262,7 @@ function hide() {
                     $("#C3").text("二轮搜证未开始，请等待...");
                 } else if(data["round1"][0]==true && data["round1"][1]==true
                     && data["round2"][0]==true && data["round2"][1]==true) {
+                     $("button").removeClass("btn-off");
                     x.style.background = "white";
                     x.style.color = "black";
                     y.style.display = "inline";
@@ -316,7 +318,6 @@ function hide() {
                             x.classList.toggle("active");
                             var content = x.nextElementSibling;
                             content.style.maxHeight = content.scrollHeight + "px";
-                            update_num();
                         }
                     },
                 });
@@ -326,6 +327,7 @@ function hide() {
         } else {
             alert("你的AP点不足！");
         }
+        update_num();
     }
 
     function hidden_clue() {
@@ -397,13 +399,13 @@ function hide() {
                             alert("该线索已被深入");
                             $("#" + clue_bid).text("已深入");
                         }
-                        update_num();
                     }
                 },
             });
         } else {
             alert("你的AP点不足！");
         }
+        update_num();
     }
 
     function update_own_clues() {
