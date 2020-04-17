@@ -228,8 +228,12 @@ function hide() {
     }
 
     function check_round_status() {
-        $(document).ready(function(){
-            $.get("/check_round_status/", function(data){
+        var user_name = $("#u_name").text().trim();
+        $.ajax({
+            url: "/check_round_status/",
+            type: "get",
+            data: {name: user_name},
+            success: function (data) {
                 var x = document.getElementById("btn1");
                 var y = document.getElementById("btn2");
                 x.className = "btn-off";
@@ -262,7 +266,7 @@ function hide() {
                     y.style.display = "inline";
                     $("#C3").text("二轮搜证开始！");
                 }
-            });
+            }
         });
     }
 

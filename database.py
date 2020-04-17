@@ -35,6 +35,9 @@ game = rd_game()
 game["murderer"] = "良小花"
 game["location map"] = {"p01": '良小花', "p02": '良星星', "p03": '米亚伦',
                         "p04": '公共区域', "p05": '现场'}
+game["descriptions"] = {"良小花": "女，当红小花，演技派。",
+                        "良星星": "女，生日寿星。",
+                        "米亚伦": "女，同班同学。"}
 
 
 def create_user(user_id, pw):

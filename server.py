@@ -52,6 +52,26 @@ def verify_user(i, p):
 
 
 # Part II: User choose character
+def ch_page():
+    """ load characters and descriptions from dictionary
+
+    :return: list containing characters and their descriptions
+    """
+    ch_names = []
+    for ch in db.game['descriptions'].keys():
+        ch_names.append([ch, db.game['descriptions'][ch]])
+    return ch_names
+
+
+def ch_chosen():
+    """ check chosen status of characters
+
+    :return: list containing boolean representing chosen status
+    """
+    result = list(db.track['chars'].values())
+    return result
+
+
 def new_ch(i, ch_name):
     """ User choose character
 
@@ -86,20 +106,29 @@ def verify_ch(i):
 
 
 # Part III: Play page
+def locations():
+    """ provide location names
+
+    :return: list containing names of the locations
+    """
+    location = list(db.game['location map'].values())
+    return location
+
+
 def start_rnd(n_rnd, u_id):
     """ Verify if all users are ready for a round of clue searching
 
     :param n_rnd: int containing round number
     :param u_id: string containing user ID
-    :return: boolean of the result, True for all ready
+    :return: '1' if the round has started, '0' if not
     """
     db.track_round(u_id, n_rnd)  # set user True for this round
     if db.track["round"] >= n_rnd:
-        return True
+        return '1'
     else:
         n_start = sum([db.user[x]["round"][n_rnd] for x in db.user])
         if n_start < db.game["player_num"]:
-            return False
+            return '0'
         else:
             db.track["round"] = n_rnd  # 给db：记录游戏轮数
             rnd = "round{}".format(n_rnd)
@@ -108,7 +137,7 @@ def start_rnd(n_rnd, u_id):
             for place in db.game["locations"]:
                 for clue in db.game["clues"][rnd][place]:
                     db.track["clues"][place].append(clue)  # 给db：更新可搜线索池
-            return True
+            return '1'
 
 
 def search_clue(u_id, place):
@@ -117,12 +146,13 @@ def search_clue(u_id, place):
     When users search a place, verify (1) if this round of clue searching has
     began, (2) if they is allowed to search this place, (3) if they have enough
     AP, and (4) if there are clues left in this place.
-    Return first a boolean representing if the search is successful and then a
-    clue or an error message.
+    Return first a clue or an error message and then boolean representing if
+    the clue has a hidden part.
 
     :param u_id: string containing user ID
     :param place: string containing place searched
-    :return: boolean containing result and string containing clue or error
+    :return: string containing clue or error and boolean representing if the
+    clue has hidden
     """
     u_ch = db.user[u_id]["char"]
     u_ap = db.user[u_id]["ap"]
@@ -151,33 +181,46 @@ def search_clue(u_id, place):
                 db.track['searched_clues'][place].append(c+'->'+u_id)
                 # 给db：记录证据归属
                 clue = c
+            db.user[u_id]['ap'] -= 2  # 给db：减ap
     return clue, has_hidden
 
 
-def update_clue_num():
-    """ Update counts of clues searched/total
+def search_hidden_clue(u_id, clue):
+    """ Search hidden clues
 
-    :return: json containing the clue nums
+    :param u_id: string containing user ID
+    :param clue: string containing the clue searched for hidden
+    :return: string containing clue or error
     """
-    # found clue num | rnd1 clue num | rnd2 clue num
-    if db.track["round"] == 0:
-        return
+    u_ch = db.user[u_id]["char"]
+    u_ap = db.user[u_id]["ap"]
+    place = ""
+    if u_ap <= 0:
+        return False, error_messages[7]
     else:
-        num_clue = np.zeros([len(db.game["locations"]), 3])
-        index = 0
-        rnd = db.track["round"]
-        for place in db.game["locations"]:
-            num_clue[index][1] = len(db.game["clues"]["round1"][place])
-            num_clue[index][2] = num_clue[index][1] + \
-                len(db.game["clues"]["round2"][place])
-            num_clue[index][0] = num_clue[index][rnd] - \
-                len(db.track["clues"][place])
-            index += 1
-        return jsonify(p01=[num_clue[0][0], num_clue[0][rnd]],
-                       p02=[num_clue[1][0], num_clue[1][rnd]],
-                       p03=[num_clue[2][0], num_clue[2][rnd]],
-                       p04=[num_clue[3][0], num_clue[3][rnd]],
-                       p05=[num_clue[4][0], num_clue[4][rnd]])
+        has_found = False
+        for p in db.track['searched_clues'].keys():
+            for c in db.track['searched_clues'][p]:
+                if clue in c.split("//")[0].split('->')[0]:
+                    place = p
+                    has_found = True
+                    c_full = c
+                    break
+            if has_found:
+                break
+        place_name = db.game['location map'][place]
+        if u_ch in place_name:
+            return error_messages[6]
+        else:
+            hidden = c_full.split('//')[1]
+            if len(hidden.split('->')) == 1:
+                c_save = c_full + '->' + u_id
+                db.track['searched_clues'][place].remove(c_full)  # 给db
+                db.track['searched_clues'][place].append(c_save)  # 给db
+                db.user[u_id]["ap"] -= 2  # 给db
+                return hidden
+            else:
+                return error_messages[9]
 
 
 def verify_release(clue, place):
@@ -214,47 +257,51 @@ def verify_release(clue, place):
             return result
 
 
-def search_hidden_clue(u_id, clue):
-    """
+def update_clue_num():
+    """ Update counts of clues searched/total
 
-    :param u_id:
-    :param clue:
-    :return:
+    :return: json containing the clue nums
     """
-    u_ch = db.user[u_id]["char"]
-    u_ap = db.user[u_id]["ap"]
-    place = ""
-    if u_ap <= 0:
-        return False, error_messages[7]
+    # found clue num | rnd1 clue num | rnd2 clue num
+    if db.track["round"] == 0:
+        return
     else:
-        has_found = False
-        for p in db.track['searched_clues'].keys():
-            for c in db.track['searched_clues'][p]:
-                if clue in c.split("//")[0].split('->')[0]:
-                    place = p
-                    has_found = True
-                    c_full = c
-                    break
-            if has_found:
-                break
-        if not has_found:
-            return False, 'No such clue found'
-        place_name = db.game['location map'][place]
-        if u_ch in place_name:
-            return False, error_messages[6]
-        else:
-            hidden = c_full.split('//')[1]
-            if len(hidden.split('->')) == 1:
-                c_save = c_full + '->' + u_id
-                db.track['searched_clues'][place].remove(c_full)  # 给db
-                db.track['searched_clues'][place].append(c_save)  # 给db
-                db.user[u_id]["ap"] -= 2  # 给db
-                return True, hidden
-            else:
-                return False, error_messages[9]
+        num_clue = np.zeros([len(db.game["locations"]), 3])
+        index = 0
+        rnd = db.track["round"]
+        for place in db.game["locations"]:
+            num_clue[index][1] = len(db.game["clues"]["round1"][place])
+            num_clue[index][2] = num_clue[index][1] + \
+                len(db.game["clues"]["round2"][place])
+            num_clue[index][0] = num_clue[index][rnd] - \
+                len(db.track["clues"][place])
+            index += 1
+        return jsonify(p01=[num_clue[0][0], num_clue[0][rnd]],
+                       p02=[num_clue[1][0], num_clue[1][rnd]],
+                       p03=[num_clue[2][0], num_clue[2][rnd]],
+                       p04=[num_clue[3][0], num_clue[3][rnd]],
+                       p05=[num_clue[4][0], num_clue[4][rnd]])
+
+
+def update_round(u_id):
+    """ Update round of the game
+
+    :return: json containing the round info
+    """
+    # check = [round1, round2], round*=[has_user_clk_rnd, has_rnd_bgn]
+    is_rnd1 = db.track['round'] > 0
+    is_rnd2 = db.track['round'] > 1
+    u_rnd1 = db.user[u_id]['round'][1]
+    u_rnd2 = db.user[u_id]['round'][2]
+    check = [[u_rnd1, is_rnd1], [u_rnd2, is_rnd2]]
+    return check
 
 
 def update_released():
+    """ Update all released clues
+
+    :return: dictionary containing all publicized clues
+    """
     rlsd_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
     # clue w/o hidden: ["clue_0", []]
     # clue w/ hidden: ["clue_0", ["clue_1"]] if "clue_1" revealed
@@ -284,6 +331,11 @@ def update_released():
 
 
 def update_own(u_id):
+    """ Update own clue for a user
+
+    :param u_id: string containing user ID
+    :return: dictionary containing clues the user searched and not publicized
+    """
     own_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
     # clue w/o hidden: [["clue_0", False], []]
     # clue w/ hidden: [["clue_0", False], [False]] "clue_1" not searched
