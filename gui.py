@@ -44,27 +44,16 @@ def login():
 # Part II: User choose character
 @app.route("/ch_names/")
 def ch_names():
-    # temporarily hard coding
-    return jsonify(ch_names=[["良小花", "女，当红小花，演技派。"],
-                             ["良星星", "女，生日寿星。"],
-                             # ["黄学", "男，学长。"],
-                             # ["黑轮海", "女，同班同学。"],
-                             # ["希嘻嘻", "女，lo裙小能手，学生会主席。"],
-                             # ["嵩主角", "男，学校助教。"],
-                             # ["大幂幂", "女，好姐妹。"],
-                             # ["tc第二帅", "男，tc第二帅2。"],
-                             # ["撒比尔", "男，小矮人。"],
-                             ["米亚伦", "女，同班同学。"]])
+    character_names = server.ch_page()
+    return jsonify(ch_names=character_names)
 
 
 @app.route("/is_chosen/")
 def is_chosen():
-    return jsonify(ch1=db.track['chars']['良小花'],  # Temp hard c
-                   ch2=db.track['chars']['良星星'],
-                   ch3=db.track['chars']['米亚伦'],
-                   # ch4=True, ch5=True,
-                   # ch6=True, ch7=True, ch8=True, ch9=True, ch10=True
-                   )
+    result = server.ch_chosen()
+    return jsonify(ch1=result[0],
+                   ch2=result[1],
+                   ch3=result[2])
 
 
 @app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
@@ -124,7 +113,9 @@ def clue_num():
 
 @app.route("/locations/")
 def locations():
-    return jsonify(l1="良小花", l2="良星星", l3="米亚伦", l4="公共区域", l5="现场")
+    places = server.locations()
+    return jsonify(l1=places[0], l2=places[1], l3=places[2], l4=places[3],
+                   l5=places[4])
 
 
 @app.route("/start_round1/")
@@ -159,6 +150,14 @@ def hidden_clue():
     return jsonify(hidden_clue=hidden)
 
 
+@app.route("/release_clue/")
+def release_clue():
+    clue = str(request.args.get("clue_to_release")).lower()
+    place = str(request.args.get("location")).lower()
+    status = server.verify_release(clue, place)  # True: has been released
+    return jsonify(status=status)
+
+
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
     clues = server.update_released()
@@ -180,12 +179,11 @@ def update_own_clues():
                    p05=clues["p05"])
 
 
-@app.route("/release_clue/")
-def release_clue():
-    clue = str(request.args.get("clue_to_release")).lower()
-    place = str(request.args.get("location")).lower()
-    status = server.verify_release(clue, place)  # True: has been released
-    return jsonify(status=status)
+@app.route("/check_round_status/")
+def check_round_status():
+    u_id = str(request.args.get("name")).lower()
+    result = server.update_round(u_id)
+    return jsonify(round1=result[0], round2=result[1])
 
 
 # Part IV: Vote
