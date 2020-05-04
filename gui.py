@@ -218,4 +218,4 @@ def final_result():
 if __name__ == "__main__":
     logging.basicConfig(filename='MMG_server.log', level=logging.INFO,
                         filemode='w')
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

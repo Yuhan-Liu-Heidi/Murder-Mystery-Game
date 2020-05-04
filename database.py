@@ -14,8 +14,8 @@ import json
 global user, game
 # Please initiate the following dict at the beginning
 user = {}
-vote = {"良小花": [], "良星星": [], "米亚伦": [], None: []}
-track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
+vote = {"李永基": [], "宋晁徽": [], "孟余生": [], "麦权承": [], None: []}
+track = {'chars': {'李永基': False, '宋晁徽': False, '孟余生': False, '麦权承': False},
          'searched_clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [],
                             'p05': []},
          'clues': {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []},
@@ -24,20 +24,19 @@ track = {'chars': {'良小花': False, '良星星': False, '米亚伦': False},
 
 def rd_game():
     global game
-    file_path = "sample_game.json"
-    in_file = open(file_path, "r")
-    game = json.load(in_file)
-    in_file.close()
-    return game
+    with open('sample_game.json', encoding='utf-8') as fr:
+        result = json.load(fr)
+    return result
 
 
 game = rd_game()
-game["murderer"] = "良小花"
-game["location map"] = {"p01": '良小花', "p02": '良星星', "p03": '米亚伦',
-                        "p04": '公共区域', "p05": '现场'}
-game["descriptions"] = {"良小花": "女，当红小花，演技派。",
-                        "良星星": "女，生日寿星。",
-                        "米亚伦": "女，同班同学。"}
+game["murderer"] = "宋晁徽"
+game["location map"] = {"p01": '李永基', "p02": '宋晁徽', "p03": '孟余生',
+                        "p04": '麦权承', "p05": '押解车'}
+game["descriptions"] = {"李永基": "男，30岁，南瞻部岛警视厅前厅长",
+                        "宋晁徽": "男，52岁，现检察院检察长",
+                        "孟余生": "男，47岁，秋门集团旗下南湾赌场老板",
+                        "麦权承": "男，22岁，捡子的好朋友。"}
 
 
 def create_user(user_id, pw):
