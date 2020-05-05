@@ -133,6 +133,21 @@ function hide() {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
+        $.get("/clue_num/", function(data){
+            var i, num;
+            var key_list = Object.keys(data);
+            for (i = 0; i < key_list.length; i++) {
+                num = key_list[i].slice(1, 3);
+                $("#p_num"+num).text(data[key_list[i]][0]);
+                $("#p_num_total"+num).text(data[key_list[i]][1]);
+            }
+        });
+        var user_name = $("#u_name").text().trim();
+        $.post("/ap_num",
+            {name: user_name},
+            function (data) {
+            $("#ap").text("AP: "+data.ap);
+        });
         $.get("/locations/", function(data) {
             var i, num;
             var key_list = Object.keys(data);
@@ -193,6 +208,7 @@ function hide() {
                         $("button").removeClass("btn-off");
                         y.className= "btn-off";
                         clearTimeout(time1);
+                        update_num();
                     } else {
                         $("#C3").text("一轮搜证未开始，请等待...");
                         time1 = setTimeout(round1, 1000);
@@ -217,6 +233,7 @@ function hide() {
                         if (data.result=="1") {
                             $("#C3").text("二轮搜证开始！");
                             clearTimeout(time2);
+                            update_num();
                         } else {
                             $("#C3").text("二轮搜证未开始，请等待...");
                             time2 = setTimeout(round2,1000);
