@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import numpy as np
 import database as db
+import math
 
 
 app = Flask(__name__)
@@ -122,6 +123,13 @@ def start_rnd(n_rnd, u_id):
     :param u_id: string containing user ID
     :return: '1' if the round has started, '0' if not
     """
+    def calc_rnd_ap():
+        total_ap = 0
+        for p in db.game["clues"][rnd]:
+            for c in db.game["clues"][rnd][p]:
+                total_ap += len(c.split("//")) + 1
+        ap = math.ceil(total_ap / len(db.game["chars"]))
+        return ap
     db.track_round(u_id, n_rnd)  # set user True for this round
     if db.track["round"] >= n_rnd:
         return '1'
@@ -133,7 +141,7 @@ def start_rnd(n_rnd, u_id):
             db.track["round"] = n_rnd  # 给db：记录游戏轮数
             rnd = "round{}".format(n_rnd)
             for user in db.user:  # 给db：玩家AP增加
-                db.user[user]["ap"] += db.game['round_ap'] * 2
+                db.user[user]["ap"] += calc_rnd_ap()
             for place in db.game["locations"]:
                 for clue in db.game["clues"][rnd][place]:
                     db.track["clues"][place].append(clue)  # 给db：更新可搜线索池
@@ -217,7 +225,7 @@ def search_hidden_clue(u_id, clue):
                 c_save = c_full + '->' + u_id
                 db.track['searched_clues'][place].remove(c_full)  # 给db
                 db.track['searched_clues'][place].append(c_save)  # 给db
-                db.user[u_id]["ap"] -= 2  # 给db
+                db.user[u_id]["ap"] -= 1  # 给db
                 return hidden
             else:
                 return error_messages[9]
