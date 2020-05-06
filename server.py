@@ -258,6 +258,11 @@ def verify_release(clue, place):
 
 
 def user_voted(u_name):
+    """ Verify if the user has voted
+
+    :param u_name: string containing user ID
+    :return: Boolean representing if the user has voted
+    """
     return db.user[u_name]["round"]["voted"]
 
 
@@ -366,6 +371,22 @@ def update_own(u_id):
 
 
 # Part IV: Vote
+def vote(u_name, ch_name, vote_name):
+    """ Verify if the user is allowed to vote and record the voting result
+
+    :param u_name: string containing user ID
+    :param ch_name: string containing character
+    :param vote_name: string containing voted character name
+    :return: Boolean representing vote status
+    """
+    n_rnd = db.track["round"]
+    if n_rnd < 2:
+        return False
+    db.vote[vote_name].append(ch_name)  # 给db：记录投票结果
+    db.user[u_name]["round"]["voted"] = True  # 给db：记录已投用户
+    return True
+
+
 def verify_vote():
     """ Verify if all users has voted
 

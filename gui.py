@@ -96,10 +96,13 @@ def play(u_name, ch_name):
                 return server.error_messages[4]
     else:
         vote_name = request.form["vote"]
-        db.vote[vote_name].append(ch_name)  # 给db：记录投票结果
-        db.user[u_name]["round"]["voted"] = True  # 给db：记录已投用户
-        app.logger.info("User {} voted {}".format(u_name, vote_name))
-        return redirect(url_for("ending"))
+        result = server.vote(u_name, ch_name, vote_name)
+        if result:
+            app.logger.info("User {} voted {}".format(u_name, vote_name))
+            return redirect(url_for("ending"))
+        else:
+            message = {"u_name": u_name, "ch_name": ch_name}
+            return render_template("play.html", msg_info=message)
 
 
 @app.route("/ap_num/", methods=["POST"])
