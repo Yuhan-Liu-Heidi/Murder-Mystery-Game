@@ -54,7 +54,8 @@ def is_chosen():
     result = server.ch_chosen()
     return jsonify(ch1=result[0],
                    ch2=result[1],
-                   ch3=result[2])
+                   ch3=result[2],
+                   ch4=result[3])
 
 
 @app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
@@ -82,6 +83,8 @@ def choose_ch(u_name):
 @app.route("/<u_name>/play/<ch_name>", methods=["GET", "POST"])
 def play(u_name, ch_name):
     if request.method == "GET":
+        if server.user_voted(u_name):
+            return redirect(url_for("ending"))
         ch = db.user[u_name]["char"]
         if ch_name == ch:
             message = {"u_name": u_name, "ch_name": ch_name}

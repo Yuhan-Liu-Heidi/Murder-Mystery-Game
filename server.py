@@ -257,6 +257,10 @@ def verify_release(clue, place):
             return result
 
 
+def user_voted(u_name):
+    return db.user[u_name]["round"]["voted"]
+
+
 def update_clue_num():
     """ Update counts of clues searched/total
 
