@@ -122,7 +122,7 @@ def locations():
 @app.route("/start_round1/")
 def start_round1():
     name1 = request.args.get("name_ready_for_1")
-    u_id = str(name1).lower()
+    u_id = str(name1)
     check = server.start_rnd(1, u_id)
     return jsonify(result=check)
 
@@ -130,31 +130,31 @@ def start_round1():
 @app.route("/start_round2/")
 def start_round2():
     name1 = request.args.get("name_ready_for_2")
-    u_id = str(name1).lower()
+    u_id = str(name1)
     check = server.start_rnd(2, u_id)
     return jsonify(result=check)
 
 
 @app.route("/find_clue/")
 def find_clue():
-    name = str(request.args.get("name_find_clue")).lower()
-    place = str(request.args.get("name_place")).lower()
+    name = str(request.args.get("name_find_clue"))
+    place = str(request.args.get("name_place"))
     clue, has_hidden = server.search_clue(name, place)
     return jsonify(clue=clue, hidden=has_hidden)
 
 
 @app.route("/hidden_clue/")
 def hidden_clue():
-    name = str(request.args.get("name_find_clue")).lower()
-    clue = str(request.args.get("clue_for_hidden")).lower()
+    name = str(request.args.get("name_find_clue"))
+    clue = str(request.args.get("clue_for_hidden"))
     hidden = server.search_hidden_clue(name, clue)
     return jsonify(hidden_clue=hidden)
 
 
 @app.route("/release_clue/")
 def release_clue():
-    clue = str(request.args.get("clue_to_release")).lower()
-    place = str(request.args.get("location")).lower()
+    clue = str(request.args.get("clue_to_release"))
+    place = str(request.args.get("location"))
     status = server.verify_release(clue, place)  # True: has been released
     return jsonify(status=status)
 
@@ -171,7 +171,7 @@ def update_revealed_clues():
 
 @app.route("/update_own_clues/")
 def update_own_clues():
-    u_id = str(request.args.get("id")).lower()
+    u_id = str(request.args.get("id"))
     clues = server.update_own(u_id)
     return jsonify(p01=clues["p01"],
                    p02=clues["p02"],
@@ -182,7 +182,7 @@ def update_own_clues():
 
 @app.route("/check_round_status/")
 def check_round_status():
-    u_id = str(request.args.get("name")).lower()
+    u_id = str(request.args.get("name"))
     result = server.update_round(u_id)
     return jsonify(round1=result[0], round2=result[1])
 
