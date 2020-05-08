@@ -615,6 +615,7 @@ function hide() {
                             }
                         }
                     }
+                    x.textContent = x.textContent.replace(x.textContent.slice(-4,-3), $("#revealed_clues_in_p"+data_key+" li").length);
                     x.classList.toggle("active");
                     var content = x.nextElementSibling;
                     content.style.maxHeight = content.scrollHeight + "px";
