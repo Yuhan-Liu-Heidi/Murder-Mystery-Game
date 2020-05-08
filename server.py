@@ -65,11 +65,13 @@ def ch_page():
 
 
 def ch_chosen():
-    """ check chosen status of characters
+    """ Return chosen status of characters in format {"ch1": True}
 
-    :return: list containing boolean representing chosen status
+    :return: dict containing boolean representing chosen status
     """
-    result = list(db.track['chars'].values())
+    result = {}
+    for i, is_chose in enumerate(db.track['chars'].values()):
+        result["ch{}".format(i+1)] = is_chose
     return result
 
 
@@ -108,11 +110,13 @@ def verify_ch(i):
 
 # Part III: Play page
 def locations():
-    """ provide location names
+    """ Return location names in format {"l1": "crime scene"}
 
-    :return: list containing names of the locations
+    :return: dict containing names of the locations
     """
-    location = list(db.game['location map'].values())
+    location = {}
+    for i, place in enumerate(db.game['location map'].values()):
+        location["l{}".format(i+1)] = place
     return location
 
 
@@ -275,106 +279,113 @@ def user_voted(u_name):
 
 
 def update_clue_num():
-    """ Update counts of clues searched/total
+    """ Update counts of clues searched/total in format {"p01": [#, #]}
 
-    :return: json containing the clue nums
+    :return: dict containing clue num of each place
     """
     # found clue num | rnd1 clue num | rnd2 clue num
-    if db.track["round"] == 0:
+    result = {}
+    rnd = db.track["round"]
+    if rnd == 0:
         return
     else:
-        num_clue = np.zeros([len(db.game["locations"]), 3])
         index = 0
-        rnd = db.track["round"]
-        for place in db.game["locations"]:
-            num_clue[index][1] = len(db.game["clues"]["round1"][place])
-            num_clue[index][2] = num_clue[index][1] + \
-                len(db.game["clues"]["round2"][place])
-            num_clue[index][0] = num_clue[index][rnd] - \
-                len(db.track["clues"][place])
+        for i, place in enumerate(db.game["locations"]):
+            key = "p{}".format(str(i+1).zfill(2))
+            if rnd == 1:
+                num_c = len(db.game["clues"]["round1"][place])
+            else:
+                num_c = len(db.game["clues"]["round1"][place]) + \
+                    len(db.game["clues"]["round2"][place])
+            num_found_c = num_c - len(db.track["clues"][place])
+            result[key] = [num_found_c, num_c]
             index += 1
-        return jsonify(p01=[num_clue[0][0], num_clue[0][rnd]],
-                       p02=[num_clue[1][0], num_clue[1][rnd]],
-                       p03=[num_clue[2][0], num_clue[2][rnd]],
-                       p04=[num_clue[3][0], num_clue[3][rnd]],
-                       p05=[num_clue[4][0], num_clue[4][rnd]])
+        return result
 
 
 def update_round(u_id):
-    """ Update round of the game
+    """ Update round of the game in format {"round1": [#, #]}
 
-    :return: json containing the round info
+    :return: dict containing the round info
     """
     # check = [round1, round2], round*=[has_user_clk_rnd, has_rnd_bgn]
     is_rnd1 = db.track['round'] > 0
     is_rnd2 = db.track['round'] > 1
     u_rnd1 = db.user[u_id]['round'][1]
     u_rnd2 = db.user[u_id]['round'][2]
-    check = [[u_rnd1, is_rnd1], [u_rnd2, is_rnd2]]
+    check = {"round1": [u_rnd1, is_rnd1], "round2": [u_rnd2, is_rnd2]}
     return check
 
 
 def update_released():
     """ Update all released clues
 
-    :return: dictionary containing all publicized clues
+    Format: {"p01": []}
+    clue w/o hidden: ["clue_0", []]
+    clue w/ hidden: ["clue_0", ["clue_1"]] if hidden released
+                    ["clue_0", [False, is_searched]] if hidden not released
+
+    :return: dict containing all released clues
     """
-    rlsd_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
-    # clue w/o hidden: ["clue_0", []]
-    # clue w/ hidden: ["clue_0", ["clue_1"]] if "clue_1" revealed
-    #                 ["clue_0", [False, is_searched]]
+    rlsd_c = {}
     n_rnd = db.track["round"]
     if n_rnd == 0:
         return rlsd_c
-    for place in db.track['searched_clues'].keys():
+    for i, place in enumerate(db.track['searched_clues'].keys()):
+        key = "p{}".format(str(i+1).zfill(2))
+        rlsd_c[key] = []
         for clue in db.track['searched_clues'][place]:
             c = clue.split("//")
             if len(c) == 1 or c[1] == '':
                 if c[0].split('->')[1] == 'publicized':
-                    rlsd_c[place].append([c[0].split('->')[0], []])
+                    rlsd_c[key].append([c[0].split('->')[0], []])
             else:
                 if c[0].split('->')[1] == 'publicized':
                     if len(c[1].split('->')) == 1:
                         c_pub = c[0].split('->')[0]
-                        rlsd_c[place].append([c_pub, [False, False]])
+                        rlsd_c[key].append([c_pub, [False, False]])
                     else:
                         if c[1].split('->')[1] == 'publicized':
                             c_pub = [c[0].split('->')[0], c[1].split('->')[0]]
-                            rlsd_c[place].append([c_pub[0], [c_pub[1]]])
+                            rlsd_c[key].append([c_pub[0], [c_pub[1]]])
                         else:
                             c_pub = c[0].split('->')[0]
-                            rlsd_c[place].append([c_pub, [False, True]])
+                            rlsd_c[key].append([c_pub, [False, True]])
     return rlsd_c
 
 
 def update_own(u_id):
     """ Update own clue for a user
 
+    Format: {"p01": []}
+    clue w/o hidden: [["clue_0", False], []]
+    clue w/ hidden: [["clue_0", False], [False]] if hidden not searched
+                    [["clue_0", False], ["clue_1", False]] if hidden searched
+
     :param u_id: string containing user ID
-    :return: dictionary containing clues the user searched and not publicized
+    :return: dict containing clues the user searched and not publicized
     """
-    own_c = {'p01': [], 'p02': [], 'p03': [], 'p04': [], 'p05': []}
-    # clue w/o hidden: [["clue_0", False], []]
-    # clue w/ hidden: [["clue_0", False], [False]] "clue_1" not searched
-    #                 [["clue_0", False], ["clue_1", False]] "clue_1" searched
+    own_c = {}
     n_rnd = db.track["round"]
     if n_rnd == 0:
         return own_c
-    for place in db.track['searched_clues'].keys():
+    for i, place in enumerate(db.track['searched_clues'].keys()):
+        key = "p{}".format(str(i+1).zfill(2))
+        own_c[key] = []
         for clue in db.track['searched_clues'][place]:
             owner = clue.split('->')[-1]
             if u_id in owner:
                 c = clue.split('//')
                 if len(c) == 1 or c[1] == '':
-                    own_c[place].append([[c[0].split('->')[0], False], []])
+                    own_c[key].append([[c[0].split('->')[0], False], []])
                 else:
                     if u_id in c[1]:
                         c_pub_0 = [c[0].split('->')[0], False]
                         c_pub_1 = [c[1].split('->')[0], False]
-                        own_c[place].append([c_pub_0, c_pub_1])
+                        own_c[key].append([c_pub_0, c_pub_1])
                     else:
                         c_pub_0 = [c[0].split('->')[0], False]
-                        own_c[place].append([c_pub_0, [False]])
+                        own_c[key].append([c_pub_0, [False]])
     return own_c
 
 
@@ -420,15 +431,15 @@ def calc_vote():
 
 
 def disp_votes():
-    """ Display voting results
+    """ Display voting results in format {"ch1": []}
 
-    :return: json containing characters voted and people who voted them
+    :return: dict containing characters voted and people who voted them
     """
-    ch_list = [x for x in db.vote.keys()]
-    return jsonify(ch1=[ch_list[0], db.vote[ch_list[0]]],
-                   ch2=[ch_list[1], db.vote[ch_list[1]]],
-                   ch3=[ch_list[2], db.vote[ch_list[2]]],
-                   ch4=["弃权", db.vote[ch_list[3]]])
+    result = {}
+    for i, ch in enumerate(db.vote.keys()):
+        key = "ch{}".format(i+1)
+        result[key] = [ch, db.vote[ch]]
+    return result
 
 
 def verify_murderer(voted):
@@ -437,15 +448,24 @@ def verify_murderer(voted):
     Check if the voted character is the true murderer, return result and the
     name of the true murderer. If there are more than one character got equal
     votes, does not reveal the true murderer and let users to decide once more.
+    Format:{"revealed": bool, "true_murder": str, "vote_murder": str,
+            "result": "Success" or "Failed"}
 
     :param voted: string containing voted character
-    :return: list containing result and true murderer
+    :return: dict containing vote result
     """
     true_murderer = db.game["murderer"]
+    result = {"revealed": True,
+              "true_murder": true_murderer,
+              "vote_murder": voted}
     if len(voted) == 1:
-        if voted == true_murderer:
-            return ["Success", true_murderer]
+        if voted[0] == true_murderer:
+            result["result"] = "Success"
+            return result
         else:
-            return ["Failed", true_murderer]
+            result["result"] = "Failed"
+            return result
     else:
-        return ["平票", "???"]
+        result["true_murder"] = "???"
+        result["result"] = "平票"
+        return result

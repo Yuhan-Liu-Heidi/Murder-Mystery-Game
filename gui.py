@@ -52,10 +52,7 @@ def ch_names():
 @app.route("/is_chosen/")
 def is_chosen():
     result = server.ch_chosen()
-    return jsonify(ch1=result[0],
-                   ch2=result[1],
-                   ch3=result[2],
-                   ch4=result[3])
+    return jsonify(result)
 
 
 @app.route("/<u_name>/choose_ch", methods=["GET", "POST"])
@@ -115,14 +112,13 @@ def ap_num():
 @app.route("/clue_num/")
 def clue_num():
     result = server.update_clue_num()
-    return result
+    return jsonify(result)
 
 
 @app.route("/locations/")
 def locations():
     places = server.locations()
-    return jsonify(l1=places[0], l2=places[1], l3=places[2], l4=places[3],
-                   l5=places[4])
+    return jsonify(places)
 
 
 @app.route("/start_round1/")
@@ -168,29 +164,21 @@ def release_clue():
 @app.route("/update_revealed_clues/")
 def update_revealed_clues():
     clues = server.update_released()
-    return jsonify(p01=clues["p01"],
-                   p02=clues["p02"],
-                   p03=clues["p03"],
-                   p04=clues["p04"],
-                   p05=clues["p05"])
+    return jsonify(clues)
 
 
 @app.route("/update_own_clues/")
 def update_own_clues():
     u_id = str(request.args.get("id"))
     clues = server.update_own(u_id)
-    return jsonify(p01=clues["p01"],
-                   p02=clues["p02"],
-                   p03=clues["p03"],
-                   p04=clues["p04"],
-                   p05=clues["p05"])
+    return jsonify(clues)
 
 
 @app.route("/check_round_status/")
 def check_round_status():
     u_id = str(request.args.get("name"))
     result = server.update_round(u_id)
-    return jsonify(round1=result[0], round2=result[1])
+    return jsonify(result)
 
 
 # Part IV: Vote
@@ -202,7 +190,7 @@ def ending():
 @app.route("/vote_result/")
 def vote_result():
     result = server.disp_votes()
-    return result
+    return jsonify(result)
 
 
 @app.route("/final_result/")
@@ -210,13 +198,11 @@ def final_result():
     vote_complete = server.verify_vote()
     if vote_complete:
         voted_murderer = server.calc_vote()
-        [result, true_murderer] = server.verify_murderer(voted_murderer)
+        result = server.verify_murderer(voted_murderer)
+        print(result)
         app.logger.info("Voting finished. Voted murderer: {}; Result: {}."
                         .format(voted_murderer, result))
-        return jsonify(revealed=True,
-                       vote_murder=voted_murderer,
-                       true_murder=true_murderer,
-                       result=result)
+        return jsonify(result)
     else:
         return jsonify(revealed=False, vote_murder=None, true_murder=None,
                        result=None)
