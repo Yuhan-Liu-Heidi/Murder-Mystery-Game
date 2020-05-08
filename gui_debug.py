@@ -110,12 +110,14 @@ def check_round_status():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p01=[3, 3], p02=[1, 4], p03=[0, 3])
+    return jsonify(p01=[3, 3], p02=[1, 4], p03=[0, 3],
+                   p04=[1, 2], p05=[0, 3])
 
 
 @app.route("/ap_num/", methods=["POST"])
 def ap_num():
-    return jsonify(ap=10)
+    name = request.form["name"]
+    return jsonify(ap=8)
 
 
 @app.route("/find_clue/")
@@ -128,7 +130,7 @@ def find_clue():
     # 2. AP不足 clue="no ap", hidden=False
     # 3. 线索搜完 clue="no clue", hidden=False
     # 4. 正常情况 clue="线索1", hidden=True/False
-    return jsonify(clue="线索1", hidden=True)
+    return jsonify(clue="线索1", hidden=False)
 
 
 @app.route("/hidden_clue/")
@@ -240,9 +242,13 @@ def final_result():
                    true_murder=true_murder, result=result)
 
 
-@app.route("/locations/")
-def locations():
-    return jsonify(l1="良小花", l2="良星星", l3="米亚伦", l4="公共区域", l5="现场")
+@app.route("/initial/")
+def initial():
+    # 一开始初始化每个人ap都一样所以就不需要知道用户名
+    # l1 = [现场名字, 该现场一轮初始线索]
+    return jsonify(l1=["良小花", 3], l2=["良星星", 4],
+                   l3=["米亚伦", 3], l4=["公共区域", 2],
+                   l5=["死者", 3], ap=10, story_name="剧本杀")
 
 
 def init_server():
