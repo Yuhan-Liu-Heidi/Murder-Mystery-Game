@@ -70,9 +70,14 @@
 
         .info {
             background-color: #dddddd;
+            display: none;
             padding:8px;
             margin-top:0px;
             margin-bottom:0px;
+            text-align: left;
+            list-style-position: inside;
+            word-wrap: break-word;
+            white-space: pre-wrap
         }
 
         .github {
@@ -134,8 +139,9 @@ function hide() {
 
 <div class="top_title">
     <h1 id="C1"></h1>
+    <p style="display: inline">User ID:</p>
     {% if msg_info %}
-        <p id="u_name" style="display: inline"> User ID: {{ msg_info["u_name"] }}</p>
+        <p id="u_name" style="display: inline-block"> {{ msg_info["u_name"] }}</p>
     {% endif %}
 </div>
 <div id="ap_div" class="top_title" style="position: -webkit-sticky; position: sticky; top: 0">
@@ -144,8 +150,8 @@ function hide() {
 
 <div id="menu" style="position: -webkit-sticky; position: sticky; top: 50px">
     <div class="menu">
-        <a style="cursor: pointer" id="info">信息</a>
-        <p class="info">角色名。。。</p>
+        <a style="cursor: pointer" id="info" onclick="refresh_info()">信息</a>
+        <ol class="info"></ol>
         <a href="#C2">故事</a>
         <a href="#C3">搜证</a>
         <a href="#C4">证据</a>
@@ -174,6 +180,7 @@ function hide() {
     <table id="locations"></table>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.js"></script>
     <script>
     $(document).ready(function() {
         $("#info").click(function(){
@@ -190,6 +197,7 @@ function hide() {
             }
 
         });
+
         $.get("/initial/", function(data){
             var i, j, num;
             $("#ap").text("AP: "+data.ap);
@@ -226,6 +234,21 @@ function hide() {
             }
         });
     });
+
+    function refresh_info() {
+        $.get("/ch_names/", function(data){
+            var i,j;
+            $(".info").empty();
+            for (i = 0; i < data["ch_names"].length; i++) {
+                if (data["ch_names"][i].length==3) {
+                    j = data["ch_names"][i][0]+": "+data["ch_names"][i][2];
+                } else {
+                    j = data["ch_names"][i][0]+": "
+                }
+                $(".info").append($('<li />', {style:"list-style-type:square",text:j}));
+            }
+        });
+    }
 
     function collapsible_btn(id) {
         var x = document.getElementById(id);
@@ -745,6 +768,6 @@ function hide() {
                 <ion-icon name="mail" size="large"></ion-icon></a>
         </div>
     </footer>
-<script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
+{#<script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>#}
 </body>
 </html>
