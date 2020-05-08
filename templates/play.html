@@ -284,6 +284,7 @@ function hide() {
                         $("button").removeClass("btn-off");
                         y.className= "btn-off";
                         clearTimeout(time1);
+                        update_num();
                     } else {
                         $("#C3").text("一轮搜证未开始，请等待...");
                         time1 = setTimeout(round1, 1000);
