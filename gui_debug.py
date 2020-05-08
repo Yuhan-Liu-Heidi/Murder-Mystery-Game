@@ -184,7 +184,7 @@ def release_clue():
     location = str(request.args.get("location")).lower()
     # is_release=True -> This clue has been released
     # is_release=False -> This clue has not been released
-    is_release = True
+    is_release = False
     if is_release is False:
         return jsonify(status="success")
     else:

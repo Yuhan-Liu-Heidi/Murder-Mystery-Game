@@ -67,7 +67,7 @@
         .content {
             padding: 0 18px;
             overflow: hidden;
-            max-height: fit-content;
+            max-height: 0;
             transition: max-height 0.2s ease-out;
             background-color: #f1f1f1;
             height: fit-content;
@@ -579,15 +579,31 @@ function hide() {
 
     function release_clue() {
         var clue_bid = event.srcElement.id;
-        if (clue_bid.endsWith("bhc") || clue_bid.endsWith("bhcr")) {
+        if (clue_bid.endsWith("bhc")) {
             var hidden_clue_id = clue_bid.replace("bhc", "hc");
-            var clue = $("#" + hidden_clue_id).text().trim();
             var location_id = "p"+clue_bid.slice(0, 2);
+            var clue_button_id = clue_bid.replace("bhc", "b");
+            var has_clue = document.getElementById(clue_button_id);
+            var clue_id = clue_bid.replace("bhc", "c");
+            if (has_clue.textContent == "公开线索") {
+                if (confirm("是否公开该深入线索和原线索（未公开）？")) {
+                    server_release_clue(clue_bid, hidden_clue_id, location_id);
+                    server_release_clue(clue_button_id, clue_id, location_id);
+                } else {
+                    return false
+                }
+            } else {
+                server_release_clue(clue_bid, hidden_clue_id, location_id);
+            }
         } else {
             var clue_id = clue_bid.replace("b", "c");
-            var clue = $("#" + clue_id).text().trim().slice(4);
             var location_id = "p"+clue_bid.slice(0, 2);
+            server_release_clue(clue_bid, clue_id, location_id)
         }
+    }
+
+    function server_release_clue(clue_bid, clue_id, location_id) {
+        var clue = $("#" + clue_id).text().trim();
         $.ajax({
             url: "/release_clue/",
             type: "get",
@@ -597,6 +613,8 @@ function hide() {
                 if (data.status == "failure") {
                     alert("该线索已被玩家公开");
                 }
+                update_revealed_clues();
+                update_own_clues();
             },
         });
     }
@@ -690,7 +708,7 @@ function hide() {
     <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
     <div>
         <div style="float:left;width:50%" id="own_clues">
-            <p>已搜证据</p>
+            <p>已搜未公开证据</p>
         </div>
 
         <div style="float:left;width:50%" id="revealed_clues">
