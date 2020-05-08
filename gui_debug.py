@@ -26,7 +26,7 @@ def login():
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
-            if request.form["username"] != "lily" \
+            if request.form["username"] != "Lily123!" \
                     or request.form["psw"] != "123":
                 error = "Invalid login please try again"
             else:
@@ -79,8 +79,8 @@ def start_round1():
     name1 = request.args.get("name_ready_for_1")
     # Receive the names that are ready.
     # OK! Everyone is ready for round 1?
-    check = "lily"
-    if str(name1).lower() == check:
+    check = "Lily123!"
+    if str(name1) == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
@@ -91,8 +91,8 @@ def start_round2():
     name1 = request.args.get("name_ready_for_2")
     # Receive the names that are ready.
     # OK! Everyone is ready for round 2?
-    check = "lily"
-    if str(name1).lower() == check:
+    check = "Lily123!"
+    if str(name1) == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
@@ -110,12 +110,14 @@ def check_round_status():
 @app.route("/clue_num/")
 def clue_num():
     # return: place=[已搜, 所有】
-    return jsonify(p01=[3, 3], p02=[1, 4], p03=[0, 3])
+    return jsonify(p01=[3, 3], p02=[1, 4], p03=[0, 3],
+                   p04=[1, 2], p05=[0, 3])
 
 
 @app.route("/ap_num/", methods=["POST"])
 def ap_num():
-    return jsonify(ap=10)
+    name = request.form["name"]
+    return jsonify(ap=8)
 
 
 @app.route("/find_clue/")
@@ -128,7 +130,7 @@ def find_clue():
     # 2. AP不足 clue="no ap", hidden=False
     # 3. 线索搜完 clue="no clue", hidden=False
     # 4. 正常情况 clue="线索1", hidden=True/False
-    return jsonify(clue="线索1", hidden=True)
+    return jsonify(clue="线索1", hidden=False)
 
 
 @app.route("/hidden_clue/")
@@ -182,7 +184,7 @@ def release_clue():
     location = str(request.args.get("location")).lower()
     # is_release=True -> This clue has been released
     # is_release=False -> This clue has not been released
-    is_release = True
+    is_release = False
     if is_release is False:
         return jsonify(status="success")
     else:
@@ -191,16 +193,17 @@ def release_clue():
 
 @app.route("/ch_names/")
 def ch_names():
-    return jsonify(ch_names=[["良小花", "女，当红小花，演技派。"],
-                             ["良星星", "女，生日寿星。"],
-                             ["米亚伦", "女，同班同学。"],
+    # add the information about user id
+    return jsonify(ch_names=[["良小花", "女，演技派。", "lily"],
+                             ["良星星", "女，生日寿星。", "111"],
+                             ["米亚伦", "女，同班同学。", "222"],
                              ["黑轮海", "女，同班同学。"],
-                             ["希嘻嘻", "女，lo裙小能手，学生会主席。"],
-                             ["嵩主角", "男，学校助教。"],
-                             ["大幂幂", "女，好姐妹。"],
-                             ["tc第二帅", "男，tc第二帅2。"],
-                             ["撒比尔", "男，小矮人。"],
-                             ["黄学", "男，学长。"]])
+                             ["希嘻嘻", "女，学生会主席。", "444"],
+                             ["嵩主角", "男，学校助教。", "555"],
+                             ["大幂幂", "女，好姐妹。", "666"],
+                             ["tc第二帅", "男，tc第二帅2。", "777"],
+                             ["撒比尔", "男，小矮人。", "888"],
+                             ["黄学", "男，学长。", "9999"]])
 
 
 @app.route("/is_chosen/")
@@ -240,9 +243,13 @@ def final_result():
                    true_murder=true_murder, result=result)
 
 
-@app.route("/locations/")
-def locations():
-    return jsonify(l1="良小花", l2="良星星", l3="米亚伦", l4="公共区域", l5="现场")
+@app.route("/initial/")
+def initial():
+    # 一开始初始化每个人ap都一样所以就不需要知道用户名
+    # l1 = [现场名字, 该现场一轮初始线索]
+    return jsonify(l1=["良小花", 3], l2=["良星星", 4],
+                   l3=["米亚伦", 3], l4=["公共区域", 2],
+                   l5=["死者", 3], ap=10, story_name="剧本杀")
 
 
 def init_server():

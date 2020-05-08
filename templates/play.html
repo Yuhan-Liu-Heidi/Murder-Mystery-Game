@@ -6,9 +6,13 @@
         * {
             box-sizing: border-box;
         }
+        p {
+            word-wrap: break-word;
+            white-space: pre-wrap
+        }
         .menu {
             float:left;
-            width:20%;
+            width:10%;
             text-align:center;
         }
         .menu a {
@@ -23,6 +27,12 @@
             float:left;
             width:100%;
             padding:0 20px;
+        }
+
+        .top_title {
+            background-color:#e5e5e5;
+            padding:15px;
+            text-align:center;
         }
 
         .collapsible {
@@ -49,12 +59,55 @@
             margin-left: 5px;
         }
 
+        a:link {
+            color: black;
+            text-decoration: none;
+        }
+
         .content {
             padding: 0 18px;
-            max-height: 0;
             overflow: hidden;
+            max-height: 0;
             transition: max-height 0.2s ease-out;
             background-color: #f1f1f1;
+            height: fit-content;
+            width: 100%;
+        }
+
+        .info {
+            background-color: #dddddd;
+            display: none;
+            padding:8px;
+            margin-top:0px;
+            margin-bottom:0px;
+            text-align: left;
+            list-style-position: inside;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .github {
+            color: #aaaaaa;
+        }
+
+        .github:hover {
+            color: black;
+        }
+
+        .github:active {
+            color: #aaaaaa;
+        }
+
+        .mail{
+            color: #aaaaaa;
+        }
+
+        .mail:hover {
+            color: #e6080c;
+        }
+
+        .mail:active {
+            color: #aaaaaa;
         }
 
         @media only screen and (max-width:620px) {
@@ -90,23 +143,25 @@ function hide() {
 
 <body style="font-family:Verdana;color:#aaaaaa;">
 
-<div style="background-color:#e5e5e5;padding:15px;text-align:center;">
-    <h1 id="C1">剧本杀2333</h1>
+<div class="top_title">
+    <h1 id="C1"></h1>
     <p style="display: inline">User ID:</p>
-        {% if msg_info %}
-            <p id="u_name" style="display: inline-block"> {{ msg_info["u_name"] }}</p>
-        {% endif %}
-        <br>
+    {% if msg_info %}
+        <p id="u_name" style="display: inline-block"> {{ msg_info["u_name"] }}</p>
+    {% endif %}
+</div>
+<div id="ap_div" class="top_title" style="position: -webkit-sticky; position: sticky; top: 0">
     <label id="ap"></label>
 </div>
 
-<div style="position: sticky; top: 0;">
+<div id="menu" style="position: -webkit-sticky; position: sticky; top: 50px">
     <div class="menu">
-        <a href="#C1">回到顶部</a>
+        <a style="cursor: pointer" id="info" onclick="refresh_info()">信息</a>
+        <ol class="info"></ol>
         <a href="#C2">故事</a>
         <a href="#C3">搜证</a>
         <a href="#C4">证据</a>
-        <a href="#C5">投票</a>
+        <a href="#C5" id="vote_ref" style="display:none">投票</a>
     </div>
 </div>
 
@@ -117,13 +172,13 @@ function hide() {
         <div id="ch_name">{{ msg_info["ch_name"] }}</div>
     {% endif %}
 
-    <h3 id="C2">故事</h3>
+    <h2 id="C2">故事</h2>
     <input type="button" id="hideImage" value="展开故事" onclick="hide()">
     <img id="myImage" src="{{ url_for("static", filename=msg_info["ch_name"]+".jpg") }}" alt="story" style="display:none;", onclick="hide()">
     <hr>
 
 
-    <h3 id="C3">搜证</h3>
+    <h2 id="C3">搜证</h2>
     <button id="btn1" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round1(); } else { return false; }">一轮搜证</button>
     <button id="btn2" class="btn-off" onclick="if (confirm('Are you sure?')) { start_round2(); } else { return false; }" style="display:none;">二轮搜证</button>
     <br>
@@ -133,51 +188,72 @@ function hide() {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
-        $.get("/clue_num/", function(data){
-            var i, num;
-            var key_list = Object.keys(data);
-            for (i = 0; i < key_list.length; i++) {
-                num = key_list[i].slice(1, 3);
-                $("#p_num"+num).text(data[key_list[i]][0]);
-                $("#p_num_total"+num).text(data[key_list[i]][1]);
+        $("#info").click(function(){
+            $(".info").slideToggle("fast");
+        });
+        $("#ap_div").click(function(){
+            var x = document.getElementById("ap_div");
+            if (x.style.position == "sticky") {
+                $("#ap_div").removeAttr("style");
+                $("#menu").css("top",0);
+            } else {
+                $("#ap_div").css({"position":"-webkit-sticky","position":"sticky","top":0});
+                $("#menu").css("top",50);
             }
+
         });
-        var user_name = $("#u_name").text().trim();
-        $.post("/ap_num",
-            {name: user_name},
-            function (data) {
+
+        $.get("/initial/", function(data){
+            var i, j, num;
             $("#ap").text("AP: "+data.ap);
-        });
-        $.get("/locations/", function(data) {
-            var i, num;
+            $("#C1").text(data.story_name);
             var key_list = Object.keys(data);
             for (i = 0; i < key_list.length; i++) {
-                if (i < 10) {
-                    num = "0"+(i+1).toString();
+                if (key_list[i]=="ap" || key_list[i]=="story_name") {
+                    continue
                 } else {
-                    num = (i+1).toString();
+                    j = key_list[i][1];
+                    if (j < 10) {
+                    num = "0"+j.toString();
+                    } else {
+                        num = j.toString();
+                    }
                 }
                 $("#locations").append($('<tr />', {id: "cloumn_"+key_list[i]}));
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: "name"+key_list[i]}));
-                $("#name"+key_list[i]).append($('<p />', {style: "display:inline;margin-right:20px", text: data[key_list[i]]}));
+                $("#name"+key_list[i]).append($('<p />', {style: "display:inline;margin-right:20px", text: data[key_list[i]][0]}));
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: key_list[i]}));
                 $("#"+key_list[i]).append($('<p />', {id: "p_num"+num, style: "display:inline", text: "0"}));
                 $("#"+key_list[i]).append(" / ");
-                $("#"+key_list[i]).append($('<p />', {id: "p_num_total"+num, style: "display:inline", text: "0"}));
+                $("#"+key_list[i]).append($('<p />', {id: "p_num_total"+num, style: "display:inline", text: data[key_list[i]][1]}));
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
                 $("#b"+key_list[i]).append($('<button />', {id: "p"+num, type:"text", class:"btn-off", style: "margin-left:10px",
                     onclick:"find_clue()", text: "搜证"}));
-                $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)",text:data[key_list[i]]}));
+                $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)",text:data[key_list[i]][0]}));
                 $("#own_clues").append($('<div />', {id:"clue_div"+num, class:"content"}));
                 $("#clue_div"+num).append($('<ol />', {id:"clues_in_p"+num}));
 
-                $("#revealed_clues").append($('<button />', {id:"revealed_col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)", text:data[key_list[i]]}));
+                $("#revealed_clues").append($('<button />', {id:"revealed_col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)", text:data[key_list[i]][0]+' (0/'+data[key_list[i]][1]+')'}));
                 $("#revealed_clues").append($('<div />', {id:"revealed_clue_div"+num, class:"content"}));
                 $("#revealed_clue_div"+num).append($('<ol />', {id:"revealed_clues_in_p"+num}));
-
             }
         });
     });
+
+    function refresh_info() {
+        $.get("/ch_names/", function(data){
+            var i,j;
+            $(".info").empty();
+            for (i = 0; i < data["ch_names"].length; i++) {
+                if (data["ch_names"][i].length==3) {
+                    j = data["ch_names"][i][0]+": "+data["ch_names"][i][2];
+                } else {
+                    j = data["ch_names"][i][0]+": "
+                }
+                $(".info").append($('<li />', {style:"list-style-type:square",text:j}));
+            }
+        });
+    }
 
     function collapsible_btn(id) {
         var x = document.getElementById(id);
@@ -215,12 +291,13 @@ function hide() {
                     }
                 },
             });
-            update_num();
         }, 1000);
     }
 
     function start_round2() {
         var x = document.getElementById("btn2");
+        var y = document.getElementById("vote_block");
+        var z = document.getElementById("vote_ref");
         x.style.background = "white";
         x.style.color = "black";
         setTimeout(function round2(){
@@ -230,22 +307,23 @@ function hide() {
                 type: "get",
                 data: {name_ready_for_2: user_name},
                 success: function round2_s(data) {
-                        if (data.result=="1") {
-                            $("#C3").text("二轮搜证开始！");
-                            clearTimeout(time2);
-                            update_num();
-                        } else {
-                            $("#C3").text("二轮搜证未开始，请等待...");
-                            time2 = setTimeout(round2,1000);
-                        }
-                    },
+                    if (data.result=="1") {
+                        $("#C3").text("二轮搜证开始！");
+                        y.style.display = "block";
+                        z.style.display= "block";
+                        clearTimeout(time2);
+                    } else {
+                        $("#C3").text("二轮搜证未开始，请等待...");
+                        time2 = setTimeout(round2,1000);
+                    }
+                },
             });
-            update_num();
         }, 1000);
     }
 
     function check_round_status() {
         var user_name = $("#u_name").text().trim();
+        var i = document.getElementById("vote_block");
         $.ajax({
             url: "/check_round_status/",
             type: "get",
@@ -284,6 +362,7 @@ function hide() {
                     x.style.color = "black";
                     y.style.display = "inline";
                     $("#C3").text("二轮搜证开始！");
+                    i.style.display = "inline";
                 }
             }
         });
@@ -500,15 +579,31 @@ function hide() {
 
     function release_clue() {
         var clue_bid = event.srcElement.id;
-        if (clue_bid.endsWith("bhc") || clue_bid.endsWith("bhcr")) {
+        if (clue_bid.endsWith("bhc")) {
             var hidden_clue_id = clue_bid.replace("bhc", "hc");
-            var clue = $("#" + hidden_clue_id).text().trim();
             var location_id = "p"+clue_bid.slice(0, 2);
+            var clue_button_id = clue_bid.replace("bhc", "b");
+            var has_clue = document.getElementById(clue_button_id);
+            var clue_id = clue_bid.replace("bhc", "c");
+            if (has_clue.textContent == "公开线索") {
+                if (confirm("是否公开该深入线索和原线索（未公开）？")) {
+                    server_release_clue(clue_bid, hidden_clue_id, location_id);
+                    server_release_clue(clue_button_id, clue_id, location_id);
+                } else {
+                    return false
+                }
+            } else {
+                server_release_clue(clue_bid, hidden_clue_id, location_id);
+            }
         } else {
             var clue_id = clue_bid.replace("b", "c");
-            var clue = $("#" + clue_id).text().trim().slice(4);
             var location_id = "p"+clue_bid.slice(0, 2);
+            server_release_clue(clue_bid, clue_id, location_id)
         }
+    }
+
+    function server_release_clue(clue_bid, clue_id, location_id) {
+        var clue = $("#" + clue_id).text().trim();
         $.ajax({
             url: "/release_clue/",
             type: "get",
@@ -518,6 +613,8 @@ function hide() {
                 if (data.status == "failure") {
                     alert("该线索已被玩家公开");
                 }
+                update_revealed_clues();
+                update_own_clues();
             },
         });
     }
@@ -565,6 +662,7 @@ function hide() {
                             }
                         }
                     }
+                    x.textContent = x.textContent.replace(x.textContent.slice(-4,-3), $("#revealed_clues_in_p"+data_key+" li").length);
                     x.classList.toggle("active");
                     var content = x.nextElementSibling;
                     content.style.maxHeight = content.scrollHeight + "px";
@@ -606,11 +704,11 @@ function hide() {
 
 
     <hr>
-    <h3 id="C4" style="display: inline-block">证据</h3>
+    <h2 id="C4" style="display: inline-block">证据</h2>
     <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
     <div>
         <div style="float:left;width:50%" id="own_clues">
-            <p>已搜证据</p>
+            <p>已搜未公开证据</p>
         </div>
 
         <div style="float:left;width:50%" id="revealed_clues">
@@ -645,9 +743,9 @@ function hide() {
     }
 </script>
 
-    <div style="float:left;width:100%">
+    <div id="vote_block" style="float:left;width:100%;display:none">
         <hr>
-        <h3 id="C5">投票</h3>
+        <h2 id="C5">投票</h2>
         <form id="vote" name="my_vote" action="" method="post" onsubmit="return validateForm()">
         </form>
     </div>
@@ -686,7 +784,14 @@ function hide() {
 </div>
 
     <footer>
-        <div style="margin-left:20%; padding:10px ;background-color: white;text-align:center;bottom:0;">© copyright Lily Heidi Lucy Mia</div>
+        <hr>
+        <div style="padding:10px; background-color:white; text-align:center; bottom:0">© copyright Lily Heidi Lucy Mia
+            <a href="https://github.com/Yuhan-Liu-Heidi/Murder-Mystery-Game" target="_blank" class="github">
+                <ion-icon name="logo-github" size="large"></ion-icon></a>
+            <a href="mailto:liangyuxu121@gmail.com" target="_blank" class="mail">
+                <ion-icon name="mail" size="large"></ion-icon></a>
+        </div>
     </footer>
+<script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
 </body>
 </html>
