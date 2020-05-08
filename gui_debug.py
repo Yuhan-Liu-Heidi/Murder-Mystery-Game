@@ -26,7 +26,7 @@ def login():
                 message = "You've signed up"
                 return render_template("login.html", msg1=message)
         elif request.form["action"] == "login":
-            if request.form["username"] != "lily" \
+            if request.form["username"] != "Lily123!" \
                     or request.form["psw"] != "123":
                 error = "Invalid login please try again"
             else:
@@ -79,8 +79,8 @@ def start_round1():
     name1 = request.args.get("name_ready_for_1")
     # Receive the names that are ready.
     # OK! Everyone is ready for round 1?
-    check = "lily"
-    if str(name1).lower() == check:
+    check = "Lily123!"
+    if str(name1) == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
@@ -91,8 +91,8 @@ def start_round2():
     name1 = request.args.get("name_ready_for_2")
     # Receive the names that are ready.
     # OK! Everyone is ready for round 2?
-    check = "lily"
-    if str(name1).lower() == check:
+    check = "Lily123!"
+    if str(name1) == check:
         return jsonify(result="1")
     else:
         return jsonify(result="0")
