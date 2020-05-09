@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * {
+        margin-bottom: 5px;
+    }
+    p {
+        word-wrap: break-word;
+        white-space: pre-wrap
+    }
+</style>
+</head>
+<body>
+
+<h2>Design for writer</h2>
+
+<div>
+    <table style="text-align: left">
+        <tr>
+            <th>Story name: </th>
+            <td><input id="story_name" type="text" size="50"></td>
+        </tr>
+        <tr>
+            <th>Round ap: </th>
+            <td><input id="round_ap" type="number"></td>
+        </tr>
+        <tr>
+            <th>Player number: </th>
+            <td><input id="p_num" type="number"></td>
+        </tr>
+    </table>
+</div>
+
+<p>Be sure to save the images of the characters' story into the directory: .../static/*.jpg</p>
+<p>The images should be named after their characters' name</p>
+<br>
+
+<div style="float: left; width: 100%">
+    <div id="ch_container" style="float: left; width: 40%">
+        <button id="add_new_ch">Add New Character &nbsp;
+            <span style="font-size:16px; font-weight:bold;">+ </span>
+        </button>
+        <p style="display: inline">（最多15个角色）</p>
+    </div>
+
+    <div id="lo_container" style="float: left; width: 60%">
+        <button id="add_new_lo">Add New Location &nbsp;
+            <span style="font-size:16px; font-weight:bold;">+ </span>
+        </button>
+        <p style="display: inline">（最多20个地点）</p>
+    </div>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var max_fields = 17;
+        $("#add_new_ch").click(function() {
+            var x = $("#ch_container li").length+1;
+            if (x < max_fields) {
+                $("#ch_delete").remove();
+                $("#ch_container").append($('<li />', {id: "ch_li"+x, style: "list-style-type:square; list-style-position:inside", text: "Name: "}));
+                $("#ch_li"+x).append($('<input />', {id: "ch"+x, type: "text", size: "43"}),
+                    $('<a />', {id: "ch_delete", href: "#", class: "delete", text: "Delete"}),
+                    $('<div />', {id: "ch_intro_div"+x, style: "margin-left:20px"}));
+                $("#ch_intro_div"+x).append($('<p />', {text: "Intro: ", style: "top:0; float:left; margin:0"}),
+                    $('<textarea />', {id: "ch_intro"+x, rows:10, cols:40, style: "margin-left:12px"}));
+            } else {
+                alert('You Reached the limits')
+            }
+        });
+
+        $("#add_new_lo").click(function() {
+            var y = $("#lo_container li").length+1;
+            if (y < max_fields) {
+                $("#lo_delete").remove();
+                $("#lo_container").append($('<li />', {id: "lo_li"+y, style: "list-style-type:square; list-style-position:inside", text: "Location: "}));
+                $("#lo_li"+y).append($('<input />', {id: "lo"+y, type: "text", size: "43"}),
+                    $('<a />', {id: "lo_delete", href: "#", class: "delete", text: "Delete"}),
+                    $('<div />', {id: "lo_li"+y+"_clue_container", style: "margin-left:22px"}));
+                $("#lo_li"+y+"_clue_container").append($('<button />', {id: "lo_li"+y+"_add_new_clue", text: "Add new clue", onclick: "add_new_clue()"}));
+                $("#lo_li"+y+"_add_new_clue").append($('<span />', {style: "font-size:16px; font-weight:bold", text: "  + "}));
+            } else {
+                alert('You Reached the limits')
+            }
+        });
+
+        $("#ch_container").on("click", "#ch_delete", function() {
+            var x1 = $("#ch_container li").length-1;
+            $(this).parent('li').remove();
+            $("#ch"+x1).after($('<a />', {id: "ch_delete", href: "#", class: "delete", text: "Delete"}));
+        });
+
+        $("#lo_container").on("click", "#lo_delete", function() {
+            var y1 = $("#lo_container li").length-1;
+            $(this).parent('li').remove();
+            $("#lo"+y1).after($('<a />', {id: "lo_delete", href: "#", class: "delete", text: "Delete"}));
+        })
+    });
+
+    function add_new_clue() {
+        var max_fields = 22;
+        var clue_bid = event.srcElement.id;
+        var clue_id = clue_bid.split("_add")[0];
+        var clue_container = clue_id+"_clue_container";
+        var z = $("#"+clue_container+" .clues").length+1;
+        if (z < max_fields) {
+            $("#"+clue_id+"_clue_delete").remove();
+            $("#"+clue_container).append($('<div />', {id: clue_id+"_clue_div"+z}));
+            $("#"+clue_id+"_clue_div"+z).append($('<p />', {text:"Clue: ", style: "top:0; float:left; margin:0"}),
+                $('<textarea />', {id: clue_id+"_clue"+z, class: "clues", rows:10, cols:40, style: "margin-left:12px"}),
+                $('<a />', {id: clue_id+"_clue_delete", href: "#", class: "delete", text: "Delete"}),
+                $('<div />', {id: clue_id+"_clue"+z+"_hidden_clue_container", style: "margin-left:48px"}));
+            $("#"+clue_id+"_clue"+z+"_hidden_clue_container").append($('<button />', {id: clue_id+"_clue"+z+"_add_new_hidden_clue", text: "Add a hidden clue", onclick: "add_hidden_clue()"}));
+            $("#"+clue_id+"_clue"+z+"_add_new_hidden_clue").append($('<span />', {style: "font-size:16px; font-weight:bold", text: "  + "}));
+        } else {
+            alert('You Reached the limits')
+        }
+
+        var delete_c_btn = '#'+clue_id+'_clue_delete';
+        $("#"+clue_container).on("click", delete_c_btn, function() {
+            var z1 = $("#"+clue_container+" .clues").length-1;
+            var clue = delete_c_btn.split("_delete")[0]+z1
+            $(this).parent('div').remove();
+            $(clue).after($('<a />', {id: clue_id+"_clue_delete", href: "#", class: "delete", text: "Delete"}));
+        })
+    }
+
+    function add_hidden_clue() {
+        var h_clue_bid = event.srcElement.id;
+        var h_clue_id = h_clue_bid.split("_add")[0];
+        var h_clue_container = h_clue_id+"_hidden_clue_container";
+        var one_hidden = document.getElementById(h_clue_id+"_hidden_clue_div");
+        if (one_hidden) {
+            return false
+        } else {
+            $("#"+h_clue_container).append($('<div />', {id: h_clue_id+"_hidden_clue_div"}));
+            $("#"+h_clue_id+"_hidden_clue_div").append($('<p />', {text:"Hidden Clue: ", style: "top:0; float:left; margin:0"}),
+                $('<textarea />', {id: h_clue_id+"_hidden_clue", class: "hidden_clues",rows:10, cols:40, style: "margin-left:12px"}),
+                $('<a />', {id: h_clue_id+"_hidden_clue_delete", href: "#", class: "delete", text: "Delete"}));
+
+            var delete_hc_btn = '#'+h_clue_id+'_hidden_clue_delete';
+            $("#"+h_clue_container).on("click", delete_hc_btn, function() {
+                $(this).parent('div').remove();
+            })
+        }
+    }
+
+    /*
+    function submit() {
+        ...
+    }
+     */
+
+</script>
+
+ <footer>
+     <hr>
+     <div style="bottom: 0; width: 100%; float: left; display: block">
+         <button id="submit" onclick="submit()" style="alignment: center; position: center">Submit</button>
+     </div>
+ </footer>
+
+</body>
+</html>
