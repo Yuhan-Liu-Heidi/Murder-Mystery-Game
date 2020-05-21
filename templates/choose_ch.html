@@ -96,7 +96,7 @@
         });
     });
 
-    $(document).ready(setInterval(function(){
+    $(document).ready(function(){
         $("*").mouseenter(function(){
             $.get("/is_chosen/", function(data){
                 var i,x;
@@ -111,7 +111,7 @@
                 }
             });
         });
-    },1000));
+    });
 </script>
 
 {% if message %}

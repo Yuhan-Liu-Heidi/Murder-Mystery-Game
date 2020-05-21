@@ -223,18 +223,17 @@ function hide() {
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: "name"+key_list[i]}));
                 $("#name"+key_list[i]).append($('<p />', {style: "display:inline;margin-right:20px", text: data[key_list[i]][0]}));
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: key_list[i]}));
-                $("#"+key_list[i]).append($('<p />', {id: "p_num"+num, style: "display:inline", text: "0"}));
-                $("#"+key_list[i]).append(" / ");
-                $("#"+key_list[i]).append($('<p />', {id: "p_num_total"+num, style: "display:inline", text: data[key_list[i]][1]}));
+                $("#"+key_list[i]).append($('<p />', {id: "p_num"+num, style: "display:inline", text: "0"}), " / ",
+                    $('<p />', {id: "p_num_total"+num, style: "display:inline", text: data[key_list[i]][1]}));
                 $("#cloumn_"+key_list[i]).append($('<td />', {id: "b"+key_list[i]}));
                 $("#b"+key_list[i]).append($('<button />', {id: "p"+num, type:"text", class:"btn-off", style: "margin-left:10px",
                     onclick:"find_clue()", text: "搜证"}));
-                $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)",text:data[key_list[i]][0]}));
-                $("#own_clues").append($('<div />', {id:"clue_div"+num, class:"content"}));
+                $("#own_clues").append($('<button />', {id:"col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)",text:data[key_list[i]][0]}),
+                    $('<div />', {id:"clue_div"+num, class:"content"}));
                 $("#clue_div"+num).append($('<ol />', {id:"clues_in_p"+num}));
 
-                $("#revealed_clues").append($('<button />', {id:"revealed_col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)", text:data[key_list[i]][0]+' (0/'+data[key_list[i]][1]+')'}));
-                $("#revealed_clues").append($('<div />', {id:"revealed_clue_div"+num, class:"content"}));
+                $("#revealed_clues").append($('<button />', {id:"revealed_col"+num, class:"collapsible", onclick: "collapsible_btn(this.id)", text:data[key_list[i]][0]+' (0/'+data[key_list[i]][1]+')'}),
+                    $('<div />', {id:"revealed_clue_div"+num, class:"content"}));
                 $("#revealed_clue_div"+num).append($('<ol />', {id:"revealed_clues_in_p"+num}));
             }
         });
@@ -505,7 +504,7 @@ function hide() {
     }
 
     function update_own_clues() {
-        var user_name = $("#u_name").text().trim()
+        var user_name = $("#u_name").text().trim();
         $.ajax({
             url: "/update_own_clues/",
             data: {id: user_name},
@@ -669,16 +668,7 @@ function hide() {
                 }
             },
         });
-    };
-
-    function refresh(){
-        update_num();
-        check_round_status();
-        update_own_clues();
-        update_revealed_clues();
-        expand_all()
     }
-    window.onload = refresh;
 
     function update_num() {
         $(document).ready(function(){
@@ -700,25 +690,6 @@ function hide() {
         });
     }
 
-    </script>
-
-
-    <hr>
-    <h2 id="C4" style="display: inline-block">证据</h2>
-    <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
-    <div>
-        <div style="float:left;width:50%" id="own_clues">
-            <p>已搜未公开证据</p>
-        </div>
-
-        <div style="float:left;width:50%" id="revealed_clues">
-            <p style="display: inline-block">公开证据</p>
-            <button id="update_revealed_clues" onclick="update_revealed_clues()">刷新公开证据</button>
-        </div>
-    </div>
-
-
-<script>
     function expand_all() {
         var coll = document.getElementsByClassName("collapsible");
         var expand_btn = document.getElementById("expand_all");
@@ -741,8 +712,32 @@ function hide() {
             }
         }
     }
-</script>
 
+    function refresh(){
+        update_num();
+        check_round_status();
+        update_own_clues();
+        update_revealed_clues();
+        expand_all()
+    }
+    window.onload = refresh;
+
+    </script>
+
+
+    <hr>
+    <h2 id="C4" style="display: inline-block">证据</h2>
+    <button id="expand_all" value="1" onclick="expand_all()">全部展开</button>
+    <div>
+        <div style="float:left;width:50%" id="own_clues">
+            <p>已搜未公开证据</p>
+        </div>
+
+        <div style="float:left;width:50%" id="revealed_clues">
+            <p style="display: inline-block">公开证据</p>
+            <button id="update_revealed_clues" onclick="update_revealed_clues()">刷新公开证据</button>
+        </div>
+    </div>
     <div id="vote_block" style="float:left;width:100%;display:none">
         <hr>
         <h2 id="C5">投票</h2>
@@ -757,13 +752,11 @@ function hide() {
                 var i;
                 for (i = 0; i < data.ch_names.length; i++) {
                     $("#vote").append($('<input />', {type: "radio", name:"vote",
-                        id: data.ch_names[i][0], value: data.ch_names[i][0]}));
-                    $("#vote").append($('<label />', {for: data.ch_names[i][0], text: data.ch_names[i][0],
-                        style: "margin-left:10px"}));
-                    $("#vote").append("<br>");
+                        id: data.ch_names[i][0], value: data.ch_names[i][0]}),
+                        $('<label />', {for: data.ch_names[i][0], text: data.ch_names[i][0], style: "margin-left:10px"}),
+                        "<br>");
                 }
-                $("#vote").append("<br>");
-                $("#vote").append($('<input />', {type: "submit",value: "Submit"}));
+                $("#vote").append("<br>", $('<input />', {type: "submit",value: "Submit"}));
             });
         });
 
@@ -783,15 +776,15 @@ function hide() {
     </div>
 </div>
 
-    <footer>
-        <hr>
-        <div style="padding:10px; background-color:white; text-align:center; bottom:0">© copyright Lily Heidi Lucy Mia
-            <a href="https://github.com/Yuhan-Liu-Heidi/Murder-Mystery-Game" target="_blank" class="github">
-                <ion-icon name="logo-github" size="large"></ion-icon></a>
-            <a href="mailto:liangyuxu121@gmail.com" target="_blank" class="mail">
-                <ion-icon name="mail" size="large"></ion-icon></a>
-        </div>
-    </footer>
+<footer>
+    <hr>
+    <div style="padding:10px; background-color:white; text-align:center; bottom:0">© copyright Lily Heidi Lucy Mia
+        <a href="https://github.com/Yuhan-Liu-Heidi/Murder-Mystery-Game" target="_blank" class="github">
+            <ion-icon name="logo-github" size="large"></ion-icon></a>
+        <a href="mailto:liangyuxu121@gmail.com" target="_blank" class="mail">
+            <ion-icon name="mail" size="large"></ion-icon></a>
+    </div>
+</footer>
 <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
 </body>
 </html>
