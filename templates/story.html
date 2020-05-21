@@ -57,10 +57,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
-        var max_fields = 17;
+        var max_fields_ch = 16;
         $("#add_new_ch").click(function() {
             var x = $("#ch_container li").length+1;
-            if (x < max_fields) {
+            if (x < max_fields_ch) {
                 $("#ch_delete").remove();
                 $("#ch_container").append($('<li />', {id: "ch_li"+x, style: "list-style-type:square; list-style-position:inside", text: "Name: "}));
                 $("#ch_li"+x).append($('<input />', {id: "ch"+x, type: "text", size: "43"}),
@@ -72,16 +72,17 @@
                 alert('You Reached the limits')
             }
         });
-
+        var max_fields_lo = 21;
         $("#add_new_lo").click(function() {
             var y = $("#lo_container li").length+1;
-            if (y < max_fields) {
+            if (y < max_fields_lo) {
                 $("#lo_delete").remove();
                 $("#lo_container").append($('<li />', {id: "lo_li"+y, style: "list-style-type:square; list-style-position:inside", text: "Location: "}));
                 $("#lo_li"+y).append($('<input />', {id: "lo"+y, type: "text", size: "43"}),
                     $('<a />', {id: "lo_delete", href: "#", class: "delete", text: "Delete"}),
                     $('<div />', {id: "lo_li"+y+"_clue_container", style: "margin-left:22px"}));
-                $("#lo_li"+y+"_clue_container").append($('<button />', {id: "lo_li"+y+"_add_new_clue", text: "Add new clue", onclick: "add_new_clue()"}));
+                $("#lo_li"+y+"_clue_container").append($('<button />', {id: "lo_li"+y+"_add_new_clue", text: "Add new clue", onclick: "add_new_clue()"}),
+                    $('<p />', {style:"display: inline", text:"（最多10条线索）"}));
                 $("#lo_li"+y+"_add_new_clue").append($('<span />', {style: "font-size:16px; font-weight:bold", text: "  + "}));
             } else {
                 alert('You Reached the limits')
@@ -102,12 +103,12 @@
     });
 
     function add_new_clue() {
-        var max_fields = 22;
+        var max_fields_clue = 11;
         var clue_bid = event.srcElement.id;
         var clue_id = clue_bid.split("_add")[0];
         var clue_container = clue_id+"_clue_container";
         var z = $("#"+clue_container+" .clues").length+1;
-        if (z < max_fields) {
+        if (z < max_fields_clue) {
             $("#"+clue_id+"_clue_delete").remove();
             $("#"+clue_container).append($('<div />', {id: clue_id+"_clue_div"+z}));
             $("#"+clue_id+"_clue_div"+z).append($('<p />', {text:"Clue: ", style: "top:0; float:left; margin:0"}),
